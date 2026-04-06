@@ -1,0 +1,6 @@
+npx create-next-app@latest netdown-test --yes
+cd netdown-test
+npm run dev
+
+Name	Age	Phone Number
+{#users}{name}	{age}	{phone}{/}
