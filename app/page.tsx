@@ -22,6 +22,8 @@ export default function TestDocx() {
           nome,
           idade: Number(idade),
           curso,
+          template: "rendimento",
+          formato: "docx",
         }),
       });
 
