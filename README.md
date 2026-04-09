@@ -1,5 +1,5 @@
 # Pre requisitos
-Node.js v18 ou superior
+Node.js v18 ou superior( comando de verificacao do terminal: node -v)
 npm
 
 # Instalacao das dependencias Dependencias
