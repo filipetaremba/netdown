@@ -1,0 +1,94 @@
+"use client"
+
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { useState } from "react"
+
+const NAV_LINKS = [
+  { label: "Início", href: "/#inicio" },
+  { label: "Sobre", href: "/#sobre" },
+  { label: "Como Funciona", href: "/#como-funciona" },
+  { label: "Documentos", href: "/#documentos" },
+  { label: "Contacto", href: "/#contacto" },
+]
+
+export default function Navbar() {
+  const pathname = usePathname()
+  const isLanding = pathname === "/"
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  // Na landing page usa âncoras directas (#section)
+  // Nas outras páginas volta à landing com o anchor (/#section)
+  const getHref = (href: string) => {
+    if (isLanding) return href.replace("/#", "#")
+    return href
+  }
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1a3fcf] shadow-md">
+      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+
+        {/* Logo */}
+        <Link href="/" className="text-white font-black text-xl tracking-widest uppercase">
+          NETDOWN
+        </Link>
+
+        {/* Links desktop */}
+        <ul className="hidden md:flex items-center gap-8">
+          {NAV_LINKS.map(({ label, href }) => (
+            <li key={href}>
+              <a
+                href={getHref(href)}
+                className="text-white/80 hover:text-white text-xs font-semibold uppercase tracking-widest transition-colors duration-200"
+              >
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        {/* CTA */}
+        <Link
+          href="/documentos"
+          className="hidden md:inline-flex items-center bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-widest px-5 py-2.5 rounded transition-colors duration-200"
+        >
+          Gerar Documento
+        </Link>
+
+        {/* Hamburguer mobile */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden text-white p-1"
+          aria-label="Menu"
+        >
+          <span className={`block w-6 h-0.5 bg-white mb-1.5 transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
+          <span className={`block w-6 h-0.5 bg-white mb-1.5 transition-all duration-300 ${menuOpen ? "opacity-0" : ""}`} />
+          <span className={`block w-6 h-0.5 bg-white transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
+        </button>
+      </div>
+
+      {/* Menu mobile */}
+      {menuOpen && (
+        <div className="md:hidden bg-[#1530a8] border-t border-white/10 px-6 py-4 flex flex-col gap-4">
+          {NAV_LINKS.map(({ label, href }) => (
+            <a
+              key={href}
+              href={getHref(href)}
+              onClick={() => setMenuOpen(false)}
+              className="text-white/80 hover:text-white text-sm font-semibold uppercase tracking-widest transition-colors"
+            >
+              {label}
+            </a>
+          ))}
+          <Link
+            href="/documentos"
+            onClick={() => setMenuOpen(false)}
+            className="mt-2 bg-red-600 text-white text-xs font-bold uppercase tracking-widest px-4 py-2.5 rounded text-center"
+          >
+            Gerar Documento
+          </Link>
+        </div>
+      )}
+    </nav>
+  )
+}

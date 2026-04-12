@@ -4,6 +4,7 @@ npm
 
 # Instalacao das dependencias Dependencias
 npm install
+npm install docx
 
 # Compile atraves de
 npm run dev
