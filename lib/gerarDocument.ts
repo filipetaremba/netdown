@@ -1,72 +1,107 @@
+
+//import path from "path";
 import fs from "fs";
-import path from "path";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
+import path from "path";
 
 type DocxData = {
-    nome: string;
-    idade: number;
-    curso: string;
-    template: "rendimento" | "declaracao" | "certificado";
-    formato: "docx" | "pdf";
+  // Dados do estudante
+  nome_estudante: string;
+  numero_BI: string;
+  cidade_emissaoBI: string;
+  data_emissaoBI: string;
+  provincia_emissaoBI: string;
+
+  // Dados académicos
+  periodo_frequentado: string;
+  faculdade_: string;
+  ano_actual: string;
+  codigo_estudante: string;
+  curso_frequentado: string;
+
+  // Dados do requerimento
+  ano_pretende_levantar: number;
+  semestre_pretendido: string;
+  data_do_dia: string;
+
+  // Contacto
+  contacto_estudante: string;
+
+  // Metadados do documento
+  template: "rendimento" | "declaracao" | "certificado";
+  formato: "docx" | "pdf";
 };
 
-// templates permitidos
 const TEMPLATE_MAP = {
-    rendimento: "rendimento.docx",
-    declaracao: "declaracao.docx",
-    certificado: "certificado.docx",
+  rendimento: "rendimento_pedagogico.docx",
+  declaracao: "declaracao_vinculo.docx",
+  certificado: "certificado.docx",
 } as const;
 
 export function generateDocx(data: DocxData): Buffer {
-    const templateFile = TEMPLATE_MAP[data.template];
+  const templateFile = TEMPLATE_MAP[data.template];
+  if (!templateFile) {
+    throw new Error("Template inválido");
+  }
 
-    if (!templateFile) {
-        throw new Error("Template inválido");
-    }
+  const filePath = path.join(
+    process.cwd(),
+    "public",
+    "templates",
+    templateFile
+  );
 
-    const filePath = path.join(
-        process.cwd(),
-        "public",
-        "templates",
-        templateFile
-    );
+  if (!fs.existsSync(filePath)) {
+    throw new Error("Arquivo de template não encontrado");
+  }
 
-    if (!fs.existsSync(filePath)) {
-        throw new Error("Arquivo de template não encontrado");
-    }
+  const content = fs.readFileSync(filePath, "binary");
+  const zip = new PizZip(content);
+  const doc = new Docxtemplater(zip, {
+    paragraphLoop: true,
+    linebreaks: true,
+  });
 
-    const content = fs.readFileSync(filePath, "binary");
+  doc.setData({
+    // Dados do estudante
+    nome_estudante: data.nome_estudante,
+    numero_BI: data.numero_BI,
+    cidade_emissaoBI: data.cidade_emissaoBI,
+    data_emissaoBI: data.data_emissaoBI,
+    provincia_emissaoBI: data.provincia_emissaoBI,
 
-    const zip = new PizZip(content);
+    // Dados académicos
+    periodo_frequentado: data.periodo_frequentado,
+    faculdade_: data.faculdade_,
+    ano_actual: data.ano_actual,
+    codigo_estudante: data.codigo_estudante,
+    curso_frequentado: data.curso_frequentado,
 
-    const doc = new Docxtemplater(zip, {
-        paragraphLoop: true,
-        linebreaks: true,
-    });
+    // Dados do requerimento
+    ano_pretende_levantar: data.ano_pretende_levantar,
+    semestre_pretendido: data.semestre_pretendido,
+    data_do_dia: data.data_do_dia,
 
-    doc.setData({
-        nome: data.nome,
-        idade: data.idade,
-        curso: data.curso,
-    });
+    // Contacto
+    contacto_estudante: data.contacto_estudante,
+  });
 
-    try {
-        doc.render();
-    } catch (error) {
-        console.error("Erro ao renderizar DOCX:", error);
-        throw new Error("Falha ao preencher o documento");
-    }
+  try {
+    doc.render();
+  } catch (error) {
+    console.error("Erro ao renderizar DOCX:", error);
+    throw new Error("Falha ao preencher o documento");
+  }
 
-    const docxBuffer = doc.getZip().generate({
-        type: "nodebuffer",
-        compression: "DEFLATE",
-    });
+  const docxBuffer = doc.getZip().generate({
+    type: "nodebuffer",
+    compression: "DEFLATE",
+  });
 
-    // ✔️ FUTURO: conversão para PDF
-    if (data.formato === "pdf") {
-        throw new Error("Conversão para PDF ainda não implementada");
-    }
+  if (data.formato === "pdf") {
+    throw new Error("Conversão para PDF ainda não implementada");
+  }
 
-    return docxBuffer;
+  return docxBuffer;
 }
