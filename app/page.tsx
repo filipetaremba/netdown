@@ -1,4 +1,16 @@
+"use client"
+
 import Link from "next/link"
+
+const NAVBAR_HEIGHT = 64
+
+const scrollToSection = (sectionId: string) => {
+  const el = document.getElementById(sectionId)
+  if (el) {
+    const top = el.getBoundingClientRect().top + window.scrollY - NAVBAR_HEIGHT
+    window.scrollTo({ top, behavior: "smooth" })
+  }
+}
 
 const documentos = [
   {
@@ -54,7 +66,7 @@ export default function LandingPage() {
       {/* ── HERO ── */}
       <section
         id="inicio"
-        className="min-h-screen bg-white flex flex-col items-center justify-center text-center px-6 pt-16"
+        className="min-h-screen bg-[#f0f4ff] flex flex-col items-center justify-center text-center px-6 pt-16"
       >
         <h1 className="text-[#1a3fcf] text-4xl md:text-5xl font-black uppercase tracking-tight leading-tight max-w-2xl">
           Plataforma de Geração Automática de Documentos Universitários
@@ -69,28 +81,24 @@ export default function LandingPage() {
           >
             Gerar Documento
           </Link>
-          <a
-            href="#como-funciona"
+          <button
+            onClick={() => scrollToSection("como-funciona")}
             className="border border-[#1a3fcf] text-[#1a3fcf] hover:bg-[#1a3fcf] hover:text-white text-xs font-bold uppercase tracking-widest px-8 py-3 transition-colors duration-200"
           >
             Como Funciona?
-          </a>
-        </div>
-
-        {/* Wave bottom */}
-        <div className="w-full mt-16">
-          <svg viewBox="0 0 1440 80" preserveAspectRatio="none" className="w-full h-16 fill-[#1a3fcf]">
-            <path d="M0,40 C400,80 1040,0 1440,50 L1440,80 L0,80 Z" />
-          </svg>
+          </button>
         </div>
       </section>
 
       {/* ── SOBRE ── */}
-      <section id="sobre" className="py-16 px-6 bg-white">
+      <section id="sobre" className="py-24 px-6 bg-white">
         <div className="max-w-3xl mx-auto">
           <p className="text-[#1a3fcf] text-xs font-bold uppercase tracking-[0.3em] mb-2 text-center">Sobre</p>
           <h2 className="text-3xl md:text-4xl font-black text-gray-900 text-center mb-10">NETDOWN</h2>
           <div className="text-gray-700 text-sm leading-relaxed space-y-4">
+            <p>
+              A NetDown é uma plataforma web dedicada à Geração Automática de Documentos Académicos de Forma Rápida, Segura e Padronizada. A NetDown é uma plataforma web dedicada à Geração Automática de Documentos Académicos de Forma Rápida, Segura e Padronizada.
+            </p>
             <p>
               A NetDown é uma plataforma web dedicada à Geração Automática de Documentos Académicos de Forma Rápida, Segura e Padronizada.
             </p>
@@ -112,7 +120,7 @@ export default function LandingPage() {
       </div>
 
       {/* ── COMO FUNCIONA ── */}
-      <section id="como-funciona" className="py-16 px-6 bg-[#f0f4ff]">
+      <section id="como-funciona" className="py-24 px-6 bg-[#f0f4ff]">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-black text-[#1a3fcf] text-center uppercase mb-4">Como Funciona?</h2>
           <p className="text-center text-gray-600 text-xs uppercase tracking-wide max-w-2xl mx-auto mb-12">
@@ -177,7 +185,7 @@ export default function LandingPage() {
 
         <div className="bg-[#1a3fcf] pb-20 px-6">
           <div className="max-w-xl mx-auto text-center">
-            <h2 className="text-white font-black text-2xl uppercase tracking-wide mb-6">Contact</h2>
+            <h2 className="text-white font-black text-2xl uppercase tracking-wide mb-6">Contacto</h2>
             <p className="text-white text-xs uppercase leading-relaxed mb-10 max-w-md mx-auto">
               Se Tiver Alguma Dúvida, Sugestão ou Encontrar Algum Problema na Utilização da Plataforma, Entre em Contacto Connosco. Estamos Disponíveis para Apoiar e Melhorar Continuamente a Experiência do Netdown.
             </p>
@@ -199,7 +207,7 @@ export default function LandingPage() {
                 />
               </div>
               <div>
-                <label className="text-white text-xs font-bold uppercase tracking-widest block mb-1">Messangem</label>
+                <label className="text-white text-xs font-bold uppercase tracking-widest block mb-1">Mensagem</label>
                 <input
                   type="text"
                   name="mensagem"
