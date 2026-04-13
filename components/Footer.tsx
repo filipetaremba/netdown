@@ -4,7 +4,6 @@ const DOC_LINKS = [
   { label: "Rendimento Pedagógico", tipo: "rendimento_pedagogico" },
   { label: "Declaração de Vínculo", tipo: "declaracao_vinculo" },
   { label: "Certificado de Conclusão", tipo: "certificado_conclusao" },
-  { label: "Diploma", tipo: "diploma" },
 ]
 
 const NAV_LINKS = [

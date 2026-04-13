@@ -24,15 +24,10 @@ const documentos = [
     tipo: "declaracao_vinculo",
   },
   {
-    titulo: "Certificado de Conclusao de Curso",
+    titulo: "Certificado de Conclusão de Curso",
     descricao:
       "Documento que atesta a conclusão de um curso, indicando que o estudante cumpriu os requisitos académicos exigidos.",
     tipo: "certificado_conclusao",
-  },
-  {
-    titulo: "Diploma",
-    descricao: "Documento oficial que certifica a conclusão de um curso superior.",
-    tipo: "diploma",
   },
 ]
 
@@ -72,11 +67,11 @@ export default function LandingPage() {
           Plataforma de Geração Automática de Documentos Universitários
         </h1>
         <p className="mt-6 text-gray-700 text-xs md:text-sm font-bold uppercase tracking-wider max-w-xl">
-          Gera Requerimentos e Declarações Académicas de Forma Rápida Segura e Acessível a Qualquer Momento e em Qualquer Dispositivo.
+          Gera Declarações, Certificados e Documentos Académicos Padronizados de Forma Rápida e Segura.
         </p>
         <div className="mt-10 flex flex-wrap gap-4 justify-center">
           <Link
-              href="/documentos/criar?tipo=declaracao_vinculo"   // ← muda aqui
+              href="/documentos/criar?tipo=declaracao_vinculo"
               className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-widest px-8 py-3 transition-colors duration-200"
             >
               Gerar Documento
