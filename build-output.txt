@@ -1,0 +1,34 @@
+﻿
+> netdown-test@0.1.0 build
+> next build
+
+▲ Next.js 16.2.2 (Turbopack)
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 11.9s
+  Running TypeScript ...
+node.exe : Failed to type check.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Failed to type check.:String) [], 
+    RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+.next/types/validator.ts:71:39
+Type error: File 
+'C:/Users/Taremba/Desktop/NetDown/netdown/app/documentos/page.tsx' is not a 
+module.
+
+  [90m69 |[0m {
+  [90m70 |[0m   [36mtype[0m __IsExpected<[33mSpecific[0m 
+[36mextends[0m [33mAppPageConfig[0m<[32m"/documentos"[0m>> = 
+[33mSpecific[0m
+[31m[1m>[0m [90m71 |[0m   [36mconst[0m handler = {} [36mas[0m 
+[36mtypeof[0m [36mimport[0m([32m"../../app/documentos/page.js"[0m)
+  [90m   |[0m                                       [31m[1m^[0m
+  [90m72 |[0m   [36mtype[0m __Check = __IsExpected<[36mtypeof[0m handler>
+  [90m73 |[0m   [90m// @ts-ignore[0m
+  [90m74 |[0m   [36mtype[0m __Unused = __Check
+Next.js build worker exited with code: 1 and signal: null

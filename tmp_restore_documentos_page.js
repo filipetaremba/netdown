@@ -1,4 +1,5 @@
-import Link from "next/link"
+const fs = require('fs');
+const content = `import Link from "next/link"
 
 const documentos = [
   {
@@ -74,7 +75,7 @@ export default function DocumentosPage() {
               {/* CTA */}
               <div className="px-6 pb-6">
                 <Link
-                  href={`/documentos/criar?tipo=${tipo}`}
+                  href={`\/documentos\/criar?tipo=\${tipo}`}
                   className="block w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-widest py-3 rounded text-center transition-all duration-200 hover:scale-[1.02]"
                 >
                   Gerar Este Documento →
@@ -92,3 +93,6 @@ export default function DocumentosPage() {
     </div>
   )
 }
+`;
+fs.writeFileSync('app/documentos/page.tsx', content, 'utf8');
+console.log('restored app/documentos/page.tsx');

@@ -5,23 +5,34 @@ import { usePathname } from "next/navigation"
 import { useState } from "react"
 
 const NAV_LINKS = [
-  { label: "Início", href: "/#inicio" },
-  { label: "Sobre", href: "/#sobre" },
-  { label: "Como Funciona", href: "/#como-funciona" },
-  { label: "Documentos", href: "/#documentos" },
-  { label: "Contacto", href: "/#contacto" },
+  { label: "Início", href: "inicio" },
+  { label: "Sobre", href: "sobre" },
+  { label: "Como Funciona", href: "como-funciona" },
+  { label: "Documentos", href: "documentos" },
+  { label: "Contacto", href: "contacto" },
 ]
+
+const NAVBAR_HEIGHT = 64
 
 export default function Navbar() {
   const pathname = usePathname()
   const isLanding = pathname === "/"
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // Na landing page usa âncoras directas (#section)
-  // Nas outras páginas volta à landing com o anchor (/#section)
-  const getHref = (href: string) => {
-    if (isLanding) return href.replace("/#", "#")
-    return href
+  const scrollToSection = (sectionId: string) => {
+    const el = document.getElementById(sectionId)
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - NAVBAR_HEIGHT
+      window.scrollTo({ top, behavior: "smooth" })
+    }
+  }
+
+  const handleNavClick = (e: React.MouseEvent, sectionId: string) => {
+    if (isLanding) {
+      e.preventDefault()
+      scrollToSection(sectionId)
+    }
+    setMenuOpen(false)
   }
 
   return (
@@ -38,7 +49,8 @@ export default function Navbar() {
           {NAV_LINKS.map(({ label, href }) => (
             <li key={href}>
               <a
-                href={getHref(href)}
+                href={isLanding ? `#${href}` : `/#${href}`}
+                onClick={(e) => handleNavClick(e, href)}
                 className="text-white/80 hover:text-white text-xs font-semibold uppercase tracking-widest transition-colors duration-200"
               >
                 {label}
@@ -73,8 +85,8 @@ export default function Navbar() {
           {NAV_LINKS.map(({ label, href }) => (
             <a
               key={href}
-              href={getHref(href)}
-              onClick={() => setMenuOpen(false)}
+              href={isLanding ? `#${href}` : `/#${href}`}
+              onClick={(e) => handleNavClick(e, href)}
               className="text-white/80 hover:text-white text-sm font-semibold uppercase tracking-widest transition-colors"
             >
               {label}
