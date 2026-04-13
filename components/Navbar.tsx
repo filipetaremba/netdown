@@ -61,11 +61,11 @@ export default function Navbar() {
 
         {/* CTA */}
         <Link
-          href="/documentos"
-          className="hidden md:inline-flex items-center bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-widest px-5 py-2.5 rounded transition-colors duration-200"
-        >
-          Gerar Documento
-        </Link>
+              href="/documentos/criar?tipo=declaracao_vinculo"   // ← muda aqui
+              className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-widest px-8 py-3 transition-colors duration-200"
+            >
+              Gerar Documento
+            </Link>
 
         {/* Hamburguer mobile */}
         <button
@@ -93,12 +93,11 @@ export default function Navbar() {
             </a>
           ))}
           <Link
-            href="/documentos"
-            onClick={() => setMenuOpen(false)}
-            className="mt-2 bg-red-600 text-white text-xs font-bold uppercase tracking-widest px-4 py-2.5 rounded text-center"
-          >
-            Gerar Documento
-          </Link>
+              href="/documentos/criar?tipo=declaracao_vinculo"   // ← muda aqui
+              className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-widest px-8 py-3 transition-colors duration-200"
+            >
+              Gerar Documento
+            </Link>
         </div>
       )}
     </nav>

@@ -76,11 +76,11 @@ export default function LandingPage() {
         </p>
         <div className="mt-10 flex flex-wrap gap-4 justify-center">
           <Link
-            href="/documentos"
-            className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-widest px-8 py-3 transition-colors duration-200"
-          >
-            Gerar Documento
-          </Link>
+              href="/documentos/criar?tipo=declaracao_vinculo"   // ← muda aqui
+              className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-widest px-8 py-3 transition-colors duration-200"
+            >
+              Gerar Documento
+            </Link>
           <button
             onClick={() => scrollToSection("como-funciona")}
             className="border border-[#1a3fcf] text-[#1a3fcf] hover:bg-[#1a3fcf] hover:text-white text-xs font-bold uppercase tracking-widest px-8 py-3 transition-colors duration-200"

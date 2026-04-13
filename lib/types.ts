@@ -1,6 +1,5 @@
 // lib/types.ts
 export type TipoDocumento =
-  | "requerimento"
   | "declaracao_vinculo"
   | "rendimento_pedagogico"
   | "certificado_conclusao"

@@ -84,11 +84,11 @@ export default function Footer() {
             © {new Date().getFullYear()} NetDown. Todos os direitos reservados.
           </p>
           <Link
-            href="/documentos"
-            className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-widest px-5 py-2.5 rounded transition-colors duration-200"
-          >
-            Gerar Documento
-          </Link>
+              href="/documentos/criar?tipo=declaracao_vinculo"   // ← muda aqui
+              className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-widest px-8 py-3 transition-colors duration-200"
+            >
+              Gerar Documento
+            </Link>
         </div>
       </div>
     </footer>
