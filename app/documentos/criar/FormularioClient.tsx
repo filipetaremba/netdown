@@ -4,14 +4,13 @@ import type { ChangeEvent } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState, useRef, useEffect } from "react"
 import { useFormStore } from "@/store/useFormStore"
+import type { TipoDocumento } from "@/lib/types"
 import FormField from "@/components/FormField"
 
-const TITULO_DOCUMENTO: Record<string, string> = {
+const TITULO_DOCUMENTO: Record<TipoDocumento, string> = {
   rendimento_pedagogico: "Rendimento Pedagógico",
   declaracao_vinculo: "Declaração de Vínculo",
   certificado_conclusao: "Certificado de Conclusão de Curso",
-  diploma: "Diploma",
-  requerimento: "Requerimento",
 }
 
 const TIPOS_LISTA = Object.entries(TITULO_DOCUMENTO)
@@ -175,7 +174,9 @@ export default function FormularioClient() {
   const params = useSearchParams()
   const { dados, setDados, setTipo } = useFormStore()
 
-  const [tipo, setTipoLocal] = useState(params.get("tipo") || "requerimento")
+  const [tipo, setTipoLocal] = useState<TipoDocumento>(
+    (params.get("tipo") as TipoDocumento) || "rendimento_pedagogico"
+  )
 
   const changeTipo = (t: string) => {
     setTipoLocal(t)
@@ -187,7 +188,7 @@ export default function FormularioClient() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setTipo(tipo as any)
+    setTipo(tipo)
     setDados({ data_actual: new Date().toLocaleDateString("pt-MZ") })
     router.push("/documentos/download")
   }

@@ -12,8 +12,8 @@ interface FormStore {
 
 export const useFormStore = create<FormStore>((set) => ({
   dados: {},
-  tipo: "requerimento",
+  tipo: "rendimento_pedagogico",
   setDados: (dados) => set((s) => ({ dados: { ...s.dados, ...dados } })),
   setTipo: (tipo) => set({ tipo }),
-  reset: () => set({ dados: {}, tipo: "requerimento" }),
+  reset: () => set({ dados: {}, tipo: "rendimento_pedagogico" }),
 }))

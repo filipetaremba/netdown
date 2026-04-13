@@ -22,13 +22,6 @@ const documentos = [
     tipo: "certificado_conclusao",
     icon: "🎓",
   },
-  {
-    titulo: "Diploma",
-    descricao: "Documento oficial que certifica formalmente a conclusão de um curso superior.",
-    detalhe: "Reconhecido por entidades nacionais e internacionais.",
-    tipo: "diploma",
-    icon: "📜",
-  },
 ]
 
 export default function DocumentosPage() {
