@@ -13,7 +13,7 @@ const TITULO_DOCUMENTO: Record<TipoDocumento, string> = {
   certificado_conclusao: "Certificado de Conclusão de Curso",
 }
 
-const TIPOS_LISTA = Object.entries(TITULO_DOCUMENTO)
+const TIPOS_LISTA: [TipoDocumento, string][] = Object.entries(TITULO_DOCUMENTO) as [TipoDocumento, string][]
 
 const PROVINCIAS = [
   "Cabo Delgado","Gaza","Inhambane","Manica",
@@ -116,8 +116,8 @@ function TipoDropdown({
   tipo,
   onChange,
 }: {
-  tipo: string
-  onChange: (t: string) => void
+  tipo: TipoDocumento
+  onChange: (t: TipoDocumento) => void
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -178,7 +178,7 @@ export default function FormularioClient() {
     (params.get("tipo") as TipoDocumento) || "rendimento_pedagogico"
   )
 
-  const changeTipo = (t: string) => {
+  const changeTipo = (t: TipoDocumento) => {
     setTipoLocal(t)
     window.history.replaceState(null, "", `/documentos/criar?tipo=${t}`)
   }
