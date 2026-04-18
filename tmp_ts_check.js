@@ -1,0 +1,12 @@
+const ts = require('typescript');
+const path = require('path');
+const project = path.resolve('tsconfig.json');
+const config = ts.readConfigFile(project, ts.sys.readFile);
+const parsed = ts.parseJsonConfigFileContent(config.config, ts.sys, path.dirname(project));
+const program = ts.createProgram(parsed.fileNames, parsed.options);
+const file = path.resolve('app/documentos/page.tsx');
+const sf = program.getSourceFile(file);
+console.log('sourceFile exists:', !!sf);
+console.log('isExternalModule:', sf && ts.isExternalModule(sf));
+console.log('hasImports:', sf && sf.statements.some(s => s.kind === ts.SyntaxKind.ImportDeclaration));
+console.log('hasExportDefault:', sf && sf.statements.some(s => ts.isFunctionDeclaration(s) && s.modifiers && s.modifiers.some(m => m.kind === ts.SyntaxKind.DefaultKeyword)));
