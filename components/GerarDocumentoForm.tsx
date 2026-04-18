@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import Navbar from "@/components/Navbar";
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Input from "@/components/Input";
 import Select from "@/components/Select";
 import Button from "@/components/Button";
+import ProgressModal from "@/components/ProgressModal";
 
 const documentTypes = [
   { label: "Rendimento Pedagógico", value: "rendimento-pedagogico" },
@@ -14,8 +14,10 @@ const documentTypes = [
   { label: "Diploma", value: "diploma" },
 ];
 
-export default function GerarDocumentoPage() {
+export default function GerarDocumentoForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const [form, setForm] = useState({
     nome: "",
@@ -34,7 +36,6 @@ export default function GerarDocumentoPage() {
     tipoDocumento: "",
   });
 
-  // Pré-selecciona o documento vindo do query param
   useEffect(() => {
     const tipo = searchParams.get("tipo");
     if (tipo) {
@@ -47,17 +48,26 @@ export default function GerarDocumentoPage() {
   };
 
   const handleSubmit = () => {
-    console.log(form);
+    if (!form.nome || !form.numeroEstudante || !form.curso || !form.tipoDocumento) {
+      alert("Por favor preenche os campos obrigatórios: Nome, Nº Estudante, Curso e Tipo de Documento.");
+      return;
+    }
+    setIsGenerating(true);
   };
+
+  const handleGenerateComplete = useCallback(() => {
+    const encoded = encodeURIComponent(JSON.stringify(form));
+    router.push(`/download?data=${encoded}`);
+  }, [form, router]);
 
   const documentoSelecionado = documentTypes.find(d => d.value === form.tipoDocumento);
 
   return (
-    <main className="min-h-screen bg-neutral-light">
-      <Navbar />
+    <>
+      {isGenerating && <ProgressModal onComplete={handleGenerateComplete} />}
+
       <section className="w-full px-6 md:px-40 py-20">
 
-        {/* Cabeçalho */}
         <div className="max-w-4xl mx-auto text-center mb-12">
           <h1 className="text-primary font-bold text-3xl md:text-4xl tracking-wide font-heading mb-4">
             Gerar Requerimento
@@ -67,7 +77,6 @@ export default function GerarDocumentoPage() {
           </p>
         </div>
 
-        {/* Passo 1 — Dropdown */}
         <div className="max-w-4xl mx-auto mb-10">
           <Select
             label="Seleccione o Tipo de Documento"
@@ -78,7 +87,6 @@ export default function GerarDocumentoPage() {
           />
         </div>
 
-        {/* Passo 2 — Formulário */}
         {form.tipoDocumento && (
           <div className="animate-fadeIn max-w-4xl mx-auto">
 
@@ -123,6 +131,6 @@ export default function GerarDocumentoPage() {
         )}
 
       </section>
-    </main>
+    </>
   );
 }

@@ -1,95 +1,85 @@
-import Link from "next/link"
-
-const DOC_LINKS = [
-  { label: "Rendimento Pedagógico", tipo: "rendimento_pedagogico" },
-  { label: "Declaração de Vínculo", tipo: "declaracao_vinculo" },
-  { label: "Certificado de Conclusão", tipo: "certificado_conclusao" },
-]
-
-const NAV_LINKS = [
-  { label: "Início", href: "/#inicio" },
-  { label: "Sobre", href: "/#sobre" },
-  { label: "Como Funciona", href: "/#como-funciona" },
-  { label: "Documentos", href: "/#documentos" },
-  { label: "Contacto", href: "/#contacto" },
-]
+const footerLinks = [
+  { label: "Inicio", href: "/" },
+  { label: "Sobre", href: "/sobre" },
+  { label: "Como Funciona", href: "/como-funciona" },
+  { label: "Documentos", href: "/documentos" },
+  { label: "Contacto", href: "#contacto" },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-[#0d1f6b] text-white">
+    <footer className="w-full bg-primary px-6 md:px-20 py-16">
 
-      {/* Wave SVG no topo — espelha o estilo da landing */}
-      <div className="w-full overflow-hidden leading-none">
-        <svg viewBox="0 0 1440 60" preserveAspectRatio="none" className="w-full h-10 fill-white">
-          <path d="M0,40 C360,0 1080,80 1440,20 L1440,0 L0,0 Z" />
-        </svg>
-      </div>
+      {/* Divisor topo */}
+      <div className="flex flex-col md:flex-row items-start justify-between gap-12 mb-12">
 
-      <div className="max-w-6xl mx-auto px-6 pt-2 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-
-          {/* Coluna 1 — Marca */}
-          <div>
-            <Link href="/" className="text-2xl font-black tracking-widest uppercase">
-              NETDOWN
-            </Link>
-            <p className="mt-3 text-white/60 text-xs leading-relaxed max-w-xs">
-              Plataforma de geração automática de documentos universitários. Rápida, segura e acessível a qualquer momento.
-            </p>
-          </div>
-
-          {/* Coluna 2 — Navegação */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">
-              Navegação
-            </h3>
-            <ul className="flex flex-col gap-2.5">
-              {NAV_LINKS.map(({ label, href }) => (
-                <li key={href}>
-                  <a
-                    href={href}
-                    className="text-white/70 hover:text-white text-sm transition-colors duration-200"
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Coluna 3 — Documentos */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">
-              Documentos
-            </h3>
-            <ul className="flex flex-col gap-2.5">
-              {DOC_LINKS.map(({ label, tipo }) => (
-                <li key={tipo}>
-                  <Link
-                    href={`/documentos/criar?tipo=${tipo}`}
-                    className="text-white/70 hover:text-white text-sm transition-colors duration-200"
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Divisor */}
-        <div className="mt-10 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-white/40 text-xs">
-            © {new Date().getFullYear()} NetDown. Todos os direitos reservados.
+        {/* Logo + Descrição */}
+        <div className="max-w-sm">
+          <a href="/" className="text-neutral-white font-bold text-2xl tracking-widest font-heading">
+            NETDOWN
+          </a>
+          <p className="text-neutral-white/70 text-sm mt-4 leading-relaxed font-sans max-w-xs">
+            Plataforma de geração automática de requerimentos universitários de forma rápida, segura e acessível a qualquer momento.
           </p>
-          <Link
-              href="/documentos/criar?tipo=declaracao_vinculo"   // ← muda aqui
-              className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-widest px-8 py-3 transition-colors duration-200"
-            >
-              Gerar Documento
-            </Link>
+
+          {/* Linha decorativa */}
+          <div className="w-10 h-[2px] bg-primary-dark mt-6"></div>
         </div>
+
+        {/* Links */}
+        <div className="flex flex-col gap-3">
+          <h4 className="text-neutral-white font-bold text-xs uppercase tracking-widest font-heading mb-3">
+            Navegação
+          </h4>
+          {footerLinks.map((link) => (
+            
+            <a  key={link.label}
+              href={link.href}
+              className="text-neutral-white/70 text-sm font-sans hover:text-neutral-white hover:translate-x-1 transition-all duration-200"
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+
+        {/* Contacto */}
+        <div className="flex flex-col gap-3">
+          <h4 className="text-neutral-white font-bold text-xs uppercase tracking-widest font-heading mb-3">
+            Contacto
+          </h4>
+          <p className="text-neutral-white/70 text-sm font-sans">
+            netdown@gmail.com
+          </p>
+          <p className="text-neutral-white/70 text-sm font-sans">
+            Beira, Moçambique
+          </p>
+        </div>
+
+        {/* CTA */}
+        <div className="flex flex-col gap-3">
+          <h4 className="text-neutral-white font-bold text-xs uppercase tracking-widest font-heading mb-3">
+            Começa Agora
+          </h4>
+          <p className="text-neutral-white/70 text-sm font-sans max-w-xs leading-relaxed">
+            Gera o teu requerimento académico em segundos.
+          </p>
+          
+          <a  href="/gerar-documento"
+            className="mt-2 inline-block bg-danger text-neutral-white text-xs font-semibold uppercase tracking-widest font-heading px-5 py-2 rounded hover:bg-danger-dark transition-all duration-200"
+          >
+            Gerar Requerimento
+          </a>
+        </div>
+
       </div>
+
+      {/* Copyright */}
+      <div className="border-t border-neutral-white/20 pt-6 flex justify-center">
+        <p className="text-neutral-white/50 text-xs font-sans text-center">
+          © {new Date().getFullYear()} NetDown. Todos os direitos reservados.
+        </p>
+      </div>
+
     </footer>
-  )
+  );
 }
