@@ -1,74 +1,89 @@
 // app/documentos/download/page.tsx
 "use client"
 import { useFormStore } from "@/store/useFormStore"
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import Button from "@/components/Button"
 
 export default function DownloadPage() {
   const { dados, tipo } = useFormStore()
-  const [blobUrl, setBlobUrl] = useState<string | null>(null)
+  const [loadingFormat, setLoadingFormat] = useState<"docx" | "pdf" | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (!dados || !tipo || !dados.nome) {
+  const hasData = !!dados && !!tipo && !!dados.nome
+
+  const download = async (formato: "docx" | "pdf") => {
+    if (!hasData) {
       setError("Dados incompletos. Volte e preencha o formulário corretamente.")
       return
     }
 
-    const controller = new AbortController()
-    setLoading(true)
     setError(null)
+    setLoadingFormat(formato)
 
-    async function generateDocument() {
-      try {
-        const response = await fetch("/api/docx", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ tipo, dados }),
-          signal: controller.signal,
-        })
+    try {
+      const response = await fetch("/api/docx", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ tipo, dados, formato }),
+      })
 
-        if (!response.ok) {
-          const text = await response.text()
-          throw new Error(text || "Erro ao gerar o documento")
-        }
-
-        const blob = await response.blob()
-        setBlobUrl(URL.createObjectURL(blob))
-      } catch (err) {
-        if ((err as any).name === "AbortError") return
-        setError((err as Error).message)
-      } finally {
-        setLoading(false)
+      if (!response.ok) {
+        const text = await response.text()
+        throw new Error(text || "Erro ao gerar o documento")
       }
-    }
 
-    generateDocument()
-
-    return () => {
-      controller.abort()
-      if (blobUrl) {
-        URL.revokeObjectURL(blobUrl)
-      }
+      const blob = await response.blob()
+      const extension = formato === "pdf" ? "pdf" : "docx"
+      const fileName = `${tipo}_${String(dados.nome).replace(/\s+/g, "_").toLowerCase()}.${extension}`
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = fileName
+      link.style.display = "none"
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setLoadingFormat(null)
     }
-  }, [dados, tipo])
+  }
 
   return (
-    <div className="text-center p-12">
-      <h1 className="text-xl font-bold">O teu documento está pronto</h1>
-      {loading && <p>Gerando documento...</p>}
-      {error && <p className="text-red-600">{error}</p>}
-      {blobUrl && !loading && (
-        <a
-          href={blobUrl}
-          download="documento.docx"
-          className="mt-4 bg-blue-600 text-white px-6 py-2 rounded inline-block"
-        >
-          Fazer Download
-        </a>
-      )}
+    <div className="min-h-screen bg-neutral-light flex items-center justify-center px-6 py-20">
+      <div className="max-w-3xl w-full bg-white rounded-3xl shadow-xl p-10 text-center">
+        <h1 className="text-3xl font-bold text-primary mb-4">Documento Pronto</h1>
+        <p className="text-neutral-dark/60 mb-8">
+          O teu requerimento está pronto para download. Escolhe o formato que preferes.
+        </p>
+
+        {error && <p className="text-red-600 mb-4">{error}</p>}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Button
+            label={loadingFormat === "docx" ? "A baixar DOCX..." : "FAZER DOWNLOAD DO DOCX"}
+            variant="primary"
+            onClick={() => download("docx")}
+            disabled={!!loadingFormat}
+          />
+          <Button
+            label={loadingFormat === "pdf" ? "A baixar PDF..." : "FAZER DOWNLOAD EM PDF"}
+            variant="outline"
+            onClick={() => download("pdf")}
+            disabled={!!loadingFormat}
+          />
+        </div>
+
+        {!hasData && (
+          <p className="text-red-600 mt-6">
+            Não há dados suficientes para gerar o documento. Volte ao formulário.
+          </p>
+        )}
+      </div>
     </div>
   )
 }

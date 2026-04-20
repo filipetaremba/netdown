@@ -19,6 +19,7 @@ type DocxApiRequest = {
   semestre_pretendido?: string
   data_do_dia?: string
   contacto_estudante?: string
+  formato?: "docx" | "pdf"
 }
 
 type DocxData = {
@@ -37,7 +38,7 @@ type DocxData = {
   data_do_dia: string
   contacto_estudante: string
   template: "rendimento" | "declaracao" | "certificado"
-  formato: "docx"
+  formato: "docx" | "pdf"
 }
 
 const TEMPLATE_MAP: Record<TipoDocumento, DocxData["template"]> = {
@@ -46,15 +47,26 @@ const TEMPLATE_MAP: Record<TipoDocumento, DocxData["template"]> = {
   certificado_conclusao: "certificado",
 }
 
+function normalizeTipo(tipo?: string): TipoDocumento | undefined {
+  if (!tipo) return undefined
+  const normalized = tipo.replace(/-/g, "_")
+  if (normalized === "rendimento_pedagogico" || normalized === "declaracao_vinculo" || normalized === "certificado_conclusao") {
+    return normalized as TipoDocumento
+  }
+  return undefined
+}
+
 function getTemplate(payload: DocxApiRequest): DocxData["template"] {
   if (payload.template) return payload.template
-  if (payload.tipo && TEMPLATE_MAP[payload.tipo]) return TEMPLATE_MAP[payload.tipo]
+  const tipo = normalizeTipo(payload.tipo)
+  if (tipo && TEMPLATE_MAP[tipo]) return TEMPLATE_MAP[tipo]
   throw new Error("Tipo de documento inválido ou não suportado")
 }
 
 function buildDocxData(payload: DocxApiRequest): DocxData {
   const source = (payload.dados ?? payload) as Partial<DadosUsuario> & DocxApiRequest
   const template = getTemplate(payload)
+  const formato = payload.formato === "pdf" ? "pdf" : "docx"
 
   if (!source.nome && !source.nome_estudante) {
     throw new Error("Campo 'nome' é obrigatório")
@@ -76,7 +88,7 @@ function buildDocxData(payload: DocxApiRequest): DocxData {
     data_do_dia: source.data_actual || source.data_do_dia || new Date().toLocaleDateString("pt-MZ"),
     contacto_estudante: source.contacto || source.contacto_estudante || "",
     template,
-    formato: "docx",
+    formato,
   }
 }
 
@@ -84,14 +96,16 @@ export async function POST(req: Request) {
   try {
     const payload = (await req.json()) as DocxApiRequest
     const docxData = buildDocxData(payload)
-    const buffer = generateDocx(docxData)
-
-    const fileName = `${docxData.template}_${docxData.nome_estudante.replace(/\s+/g, "_").toLowerCase()}.docx`
+    const buffer = await generateDocx(docxData)
+    const extension = docxData.formato === "pdf" ? "pdf" : "docx"
+    const contentType = docxData.formato === "pdf"
+      ? "application/pdf"
+      : "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    const fileName = `${docxData.template}_${docxData.nome_estudante.replace(/\s+/g, "_").toLowerCase()}.${extension}`
 
     return new Response(Buffer.from(buffer), {
       headers: {
-        "Content-Type":
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "Content-Type": contentType,
         "Content-Disposition": `attachment; filename="${fileName}"`,
       },
     })

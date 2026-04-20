@@ -4,6 +4,7 @@ import fs from "fs";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import path from "path";
+import libreofficeConvert from "libreoffice-convert";
 
 type DocxData = {
   // Dados do estudante
@@ -39,7 +40,7 @@ const TEMPLATE_MAP = {
   certificado: "certificado.docx",
 } as const;
 
-export function generateDocx(data: DocxData): Buffer {
+export async function generateDocx(data: DocxData): Promise<Buffer> {
   const templateFile = TEMPLATE_MAP[data.template];
   if (!templateFile) {
     throw new Error("Template inválido");
@@ -100,7 +101,15 @@ export function generateDocx(data: DocxData): Buffer {
   });
 
   if (data.formato === "pdf") {
-    throw new Error("Conversão para PDF ainda não implementada");
+    return await new Promise<Buffer>((resolve, reject) => {
+      libreofficeConvert.convert(docxBuffer, ".pdf", undefined, (err, done) => {
+        if (err) {
+          reject(err)
+          return
+        }
+        resolve(done as Buffer)
+      })
+    })
   }
 
   return docxBuffer;

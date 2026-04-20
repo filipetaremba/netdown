@@ -11,25 +11,73 @@ const documentLabels: Record<string, string> = {
   "diploma": "Diploma",
 };
 
+type DownloadPayload = {
+  tipo: string;
+  dados: Record<string, unknown>;
+};
+
 export default function DownloadPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [tipoLabel, setTipoLabel] = useState("");
+  const [payload, setPayload] = useState<DownloadPayload | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const raw = searchParams.get("data");
-    if (!raw) { router.replace("/gerar-documento"); return; }
+    if (!raw) {
+      router.replace("/gerar-documento");
+      return;
+    }
+
     try {
-      const parsed = JSON.parse(decodeURIComponent(raw));
-      setTipoLabel(documentLabels[parsed.tipoDocumento] ?? parsed.tipoDocumento);
+      const parsed = JSON.parse(decodeURIComponent(raw)) as DownloadPayload;
+      const label =
+        documentLabels[parsed.tipo] ??
+        documentLabels[parsed.tipo.replace(/_/g, "-")] ??
+        parsed.tipo;
+      setTipoLabel(label);
+      setPayload(parsed);
     } catch {
       router.replace("/gerar-documento");
     }
   }, [searchParams, router]);
 
-  const handleDownload = () => {
-    // Integra aqui a tua API de geração de PDF
-    // Ex: window.open("/api/gerar-pdf?data=...", "_blank")
+  const handleDownload = async () => {
+    if (!payload) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/docx", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Erro ao gerar o documento");
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const fileName = `${payload.tipo}_${String(payload.dados.nome ?? "documento").replace(/\s+/g, "_").toLowerCase()}.docx`;
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!tipoLabel) return null;
@@ -45,9 +93,14 @@ export default function DownloadPage() {
         </p>
       </div>
 
-      <div className="flex justify-center">
-        <Button label="FAZER DOWNLOAD DO PDF" variant="primary" onClick={handleDownload} />
-      </div>
+      {error && <p className="text-red-600 mb-4">{error}</p>}
+      {loading ? (
+        <p>Gerando o documento...</p>
+      ) : (
+        <div className="flex justify-center">
+          <Button label="FAZER DOWNLOAD DO DOCX" variant="primary" onClick={handleDownload} disabled={loading} />
+        </div>
+      )}
     </section>
   );
 }

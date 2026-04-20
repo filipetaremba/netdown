@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  icons: {
+    icon: '/logo.ico',
+  },
   title: "Netdown",
   description: "Plataforma de Geração Automática de Documentos Universitários",
 };

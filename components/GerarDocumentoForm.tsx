@@ -55,8 +55,36 @@ export default function GerarDocumentoForm() {
     setIsGenerating(true);
   };
 
+  const documentTypeMap: Record<string, string> = {
+    "rendimento-pedagogico": "rendimento_pedagogico",
+    "declaracao-vinculo": "declaracao_vinculo",
+    "certificado-conclusao": "certificado_conclusao",
+    diploma: "rendimento_pedagogico",
+  };
+
   const handleGenerateComplete = useCallback(() => {
-    const encoded = encodeURIComponent(JSON.stringify(form));
+    const apiTipo = documentTypeMap[form.tipoDocumento] ?? form.tipoDocumento;
+
+    const payload = {
+      tipo: apiTipo,
+      dados: {
+        nome: form.nome,
+        bi_numero: form.numeroBilhete,
+        bi_emissao_local: form.localEmissao,
+        bi_emissao_data: form.dataEmissao,
+        cidade: form.residencia,
+        provincia: form.provincia,
+        nacionalidade: form.nacionalidade,
+        periodo: form.periodoFrequencia,
+        faculdade: form.faculdade,
+        ano_lectivo: form.anoLectivo,
+        registo_n: form.numeroEstudante,
+        curso: form.curso,
+        ano_actual: Number(form.ano) || 0,
+        data_actual: new Date().toLocaleDateString("pt-MZ"),
+      },
+    };
+    const encoded = encodeURIComponent(JSON.stringify(payload));
     router.push(`/download?data=${encoded}`);
   }, [form, router]);
 
