@@ -20,6 +20,8 @@ export interface DadosUsuario {
   registo_n: string
   curso: string
   ano_actual: number
+  ano_pretende_levantar: number
+  semestre_pretendido: string
   justificativo: string
   contacto: string
   data_actual: string

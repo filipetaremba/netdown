@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Button from "@/components/Button";
+import Link from 'next/link';
 
 const navLinks = [
   {label: "INICIO",href: "#inicio"},
@@ -19,9 +20,11 @@ export default function Navbar() {
       <div className="flex items-center justify-between">
 
         {/* Logo */}
-        <span className="text-neutral-white font-bold text-xl tracking-widest font-heading">
-          NETDOWN
-        </span>
+        <Link href="/">
+          <span className="text-neutral-white font-bold text-xl tracking-widest font-heading">
+            NETDOWN
+          </span>
+        </Link>
 
         {/* Desktop — Links + Botão */}
         <div className="hidden md:flex items-center gap-8">

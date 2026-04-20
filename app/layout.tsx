@@ -7,6 +7,13 @@ export const metadata: Metadata = {
   },
   title: "Netdown",
   description: "Plataforma de Geração Automática de Documentos Universitários",
+  keywords: [
+    "documentos universitários",
+    "rendimento pedagógico",
+    "declaração de vínculo",
+    "certificado de conclusão",
+    "gerador de documentos",
+  ]
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

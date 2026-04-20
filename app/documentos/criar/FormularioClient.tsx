@@ -268,6 +268,32 @@ export default function FormularioClient() {
               value={dados.ano_actual?.toString() || ""}
               onChange={(e) => setDados({ ano_actual: Number(e.target.value) })} />
 
+            {tipo === "rendimento_pedagogico" && (
+              <>
+                <FormField label="Ano que pretende levantar" name="ano_pretende_levantar" type="number"
+                  placeholder="Ex: 3"
+                  value={dados.ano_pretende_levantar?.toString() || ""}
+                  onChange={(e) => setDados({ ano_pretende_levantar: e.target.value ? Number(e.target.value) : undefined })} />
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-[#1a3fcf] uppercase tracking-wide">
+                    Semestre pretendido
+                  </label>
+                  <select
+                    name="semestre_pretendido"
+                    value={dados.semestre_pretendido || ""}
+                    onChange={(e) => setDados({ semestre_pretendido: e.target.value })}
+                    className="border border-[#1a3fcf]/30 rounded px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-[#1a3fcf] focus:ring-1 focus:ring-[#1a3fcf]/20 bg-white transition-colors duration-200"
+                  >
+                    <option value="">Selecione o semestre</option>
+                    <option value="1º Semestre">1º Semestre</option>
+                    <option value="2º Semestre">2º Semestre</option>
+                    <option value="1º e 2º Semestre">1º e 2º Semestre</option>
+                  </select>
+                </div>
+              </>
+            )}
+
             <TelefoneField
               value={dados.contacto || ""}
               onChange={(val) => setDados({ contacto: val })}

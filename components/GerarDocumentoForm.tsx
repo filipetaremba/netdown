@@ -33,6 +33,8 @@ export default function GerarDocumentoForm() {
     numeroEstudante: "",
     curso: "",
     ano: "",
+    anoPretendeLevantar: "",
+    semestrePretendido: "",
     tipoDocumento: "",
   });
 
@@ -49,9 +51,15 @@ export default function GerarDocumentoForm() {
 
   const handleSubmit = () => {
     if (!form.nome || !form.numeroEstudante || !form.curso || !form.tipoDocumento) {
-      alert("Por favor preenche os campos obrigatórios: Nome, Nº Estudante, Curso e Tipo de Documento.");
+      alert("Por favor preencha os campos obrigatórios: Nome, Nº Estudante, Curso e Tipo de Documento.");
       return;
     }
+
+    if (form.tipoDocumento === "rendimento-pedagogico" && (!form.anoPretendeLevantar || !form.semestrePretendido)) {
+      alert("Por favor preencha o ano e o semestre pretendido para o rendimento pedagógico.");
+      return;
+    }
+
     setIsGenerating(true);
   };
 
@@ -81,6 +89,8 @@ export default function GerarDocumentoForm() {
         registo_n: form.numeroEstudante,
         curso: form.curso,
         ano_actual: Number(form.ano) || 0,
+        ano_pretende_levantar: Number(form.anoPretendeLevantar) || 0,
+        semestre_pretendido: form.semestrePretendido,
         data_actual: new Date().toLocaleDateString("pt-MZ"),
       },
     };
@@ -140,6 +150,36 @@ export default function GerarDocumentoForm() {
               <Input label="Número do Estudante" name="numeroEstudante" placeholder="Ex: 2021001234" value={form.numeroEstudante} onChange={handleChange} />
               <Input label="Curso" name="curso" placeholder="Ex: Engenharia Informática" value={form.curso} onChange={handleChange} />
               <Input label="Ano" name="ano" placeholder="Ex: 4" value={form.ano} onChange={handleChange} />
+
+              {form.tipoDocumento === "rendimento-pedagogico" && (
+                <>
+                  <Input
+                    label="Ano que pretende levantar"
+                    name="anoPretendeLevantar"
+                    type="number"
+                    placeholder="Ex: 3"
+                    value={form.anoPretendeLevantar}
+                    onChange={handleChange}
+                  />
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-primary text-xs font-semibold uppercase tracking-widest font-heading">
+                      Semestre pretendido
+                    </label>
+                    <select
+                      name="semestrePretendido"
+                      value={form.semestrePretendido}
+                      onChange={handleChange}
+                      className="border border-primary/30 rounded px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 bg-white transition-colors duration-200"
+                    >
+                      <option value="">Selecione o semestre</option>
+                      <option value="1º Semestre">1º Semestre</option>
+                      <option value="2º Semestre">2º Semestre</option>
+                      <option value="1º e 2º Semestre">1º e 2º Semestre</option>
+                    </select>
+                  </div>
+                </>
+              )}
 
               <div className="flex flex-col gap-1 w-full">
                 <label className="text-primary text-xs font-semibold uppercase tracking-widest font-heading">

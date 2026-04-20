@@ -94,13 +94,9 @@ export default function DownloadPage() {
       </div>
 
       {error && <p className="text-red-600 mb-4">{error}</p>}
-      {loading ? (
-        <p>Gerando o documento...</p>
-      ) : (
-        <div className="flex justify-center">
-          <Button label="FAZER DOWNLOAD DO DOCX" variant="primary" onClick={handleDownload} disabled={loading} />
-        </div>
-      )}
+      <div className="flex justify-center">
+        <Button label="FAZER DOWNLOAD DO DOCX" variant="primary" onClick={handleDownload} disabled={loading} />
+      </div>
     </section>
   );
 }

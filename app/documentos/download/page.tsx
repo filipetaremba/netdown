@@ -1,13 +1,13 @@
 // app/documentos/download/page.tsx
 "use client"
 import { useFormStore } from "@/store/useFormStore"
-import { useState } from "react"
-import Button from "@/components/Button"
+import { useState, useEffect } from "react"
 
 export default function DownloadPage() {
   const { dados, tipo } = useFormStore()
   const [loadingFormat, setLoadingFormat] = useState<"docx" | "pdf" | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [autoDownloaded, setAutoDownloaded] = useState(false)
 
   const hasData = !!dados && !!tipo && !!dados.nome
 
@@ -53,6 +53,13 @@ export default function DownloadPage() {
     }
   }
 
+  useEffect(() => {
+    if (hasData && !autoDownloaded) {
+      setAutoDownloaded(true)
+      download("docx")
+    }
+  }, [autoDownloaded, hasData])
+
   return (
     <div className="min-h-screen bg-neutral-light flex items-center justify-center px-6 py-20">
       <div className="max-w-3xl w-full bg-white rounded-3xl shadow-xl p-10 text-center">
@@ -61,24 +68,20 @@ export default function DownloadPage() {
           O teu requerimento está pronto para download. Escolhe o formato que preferes.
         </p>
 
-        {error && <p className="text-red-600 mb-4">{error}</p>}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Button
-            label={loadingFormat === "docx" ? "A baixar DOCX..." : "FAZER DOWNLOAD DO DOCX"}
-            variant="primary"
-            onClick={() => download("docx")}
-            disabled={!!loadingFormat}
-          />
-          <Button
-            label={loadingFormat === "pdf" ? "A baixar PDF..." : "FAZER DOWNLOAD EM PDF"}
-            variant="outline"
-            onClick={() => download("pdf")}
-            disabled={!!loadingFormat}
-          />
-        </div>
-
-        {!hasData && (
+        {error ? (
+          <div className="space-y-4">
+            <p className="text-red-600 mb-4">{error}</p>
+            <p className="text-neutral-dark/70 text-sm">
+              Por favor volte ao formulário e verifique os dados antes de tentar novamente.
+            </p>
+          </div>
+        ) : loadingFormat ? (
+          <p className="text-neutral-dark/70 text-sm">A iniciar o download do documento... aguarde.</p>
+        ) : hasData ? (
+          <p className="text-neutral-dark/70 text-sm">
+            Se o download não iniciar automaticamente, atualize a página ou volte ao formulário.
+          </p>
+        ) : (
           <p className="text-red-600 mt-6">
             Não há dados suficientes para gerar o documento. Volte ao formulário.
           </p>
