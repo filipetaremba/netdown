@@ -104,12 +104,13 @@ export async function generateDocx(data: DocxData): Promise<Buffer> {
     return await new Promise<Buffer>((resolve, reject) => {
       libreofficeConvert.convert(docxBuffer, ".pdf", undefined, (err, done) => {
         if (err) {
-          reject(err)
-          return
+          console.error("Erro na conversão para PDF:", err);
+          reject(new Error("Falha ao converter documento para PDF. Verifique se o LibreOffice está instalado."));
+          return;
         }
-        resolve(done as Buffer)
-      })
-    })
+        resolve(done as Buffer);
+      });
+    });
   }
 
   return docxBuffer;
