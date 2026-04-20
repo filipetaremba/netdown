@@ -5,6 +5,8 @@ import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import path from "path";
 import libreofficeConvert from "libreoffice-convert";
+import mammoth from "mammoth";
+import puppeteer from "puppeteer";
 
 type DocxData = {
   // Dados do estudante
@@ -101,16 +103,18 @@ export async function generateDocx(data: DocxData): Promise<Buffer> {
   });
 
   if (data.formato === "pdf") {
-    return await new Promise<Buffer>((resolve, reject) => {
-      libreofficeConvert.convert(docxBuffer, ".pdf", undefined, (err, done) => {
-        if (err) {
-          console.error("Erro na conversão para PDF:", err);
-          reject(new Error("Falha ao converter documento para PDF. Verifique se o LibreOffice está instalado."));
-          return;
-        }
-        resolve(done as Buffer);
-      });
-    });
+    // Converter DOCX para HTML usando mammoth
+    const htmlResult = await mammoth.convertToHtml({ buffer: docxBuffer });
+    const html = htmlResult.value;
+
+    // Converter HTML para PDF usando puppeteer
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(html);
+    const pdfBuffer = await page.pdf({ format: 'A4' });
+    await browser.close();
+
+    return Buffer.from(pdfBuffer);
   }
 
   return docxBuffer;
