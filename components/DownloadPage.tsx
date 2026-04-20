@@ -98,7 +98,7 @@ export default function DownloadPage() {
       {error && <p className="text-red-600 mb-4">{error}</p>}
       <div className="flex justify-center gap-4">
         <Button label="FAZER DOWNLOAD DO DOCX" variant="primary" onClick={() => handleDownload("docx")} disabled={loading} />
-        <Button label="FAZER DOWNLOAD DO PDF" variant="outline" onClick={() => handleDownload("pdf")} disabled={loading} />
+        {/* <Button label="FAZER DOWNLOAD DO PDF" variant="outline" onClick={() => handleDownload("pdf")} disabled={loading} /> */}
       </div>
     </section>
   );
