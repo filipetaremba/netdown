@@ -14,6 +14,7 @@ const documentLabels: Record<string, string> = {
 type DownloadPayload = {
   tipo: string;
   dados: Record<string, unknown>;
+  formato?: "docx" | "pdf";
 };
 
 export default function DownloadPage() {
@@ -44,17 +45,18 @@ export default function DownloadPage() {
     }
   }, [searchParams, router]);
 
-  const handleDownload = async () => {
+  const handleDownload = async (format: "docx" | "pdf") => {
     if (!payload) return;
 
     setLoading(true);
     setError(null);
 
     try {
+      const downloadPayload = { ...payload, formato: format };
       const response = await fetch("/api/docx", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(downloadPayload),
       });
 
       if (!response.ok) {
@@ -63,16 +65,16 @@ export default function DownloadPage() {
       }
 
       const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const fileName = `${payload.tipo}_${String(payload.dados.nome ?? "documento").replace(/\s+/g, "_").toLowerCase()}.docx`;
+      const extension = format === "pdf" ? "pdf" : "docx";
+      const fileName = `${payload.tipo}_${String(payload.dados.nome ?? "documento").replace(/\s+/g, "_").toLowerCase()}.${extension}`;
       const link = document.createElement("a");
-      link.href = url;
+      link.href = URL.createObjectURL(blob);
       link.download = fileName;
       link.style.display = "none";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -94,8 +96,9 @@ export default function DownloadPage() {
       </div>
 
       {error && <p className="text-red-600 mb-4">{error}</p>}
-      <div className="flex justify-center">
-        <Button label="FAZER DOWNLOAD DO DOCX" variant="primary" onClick={handleDownload} disabled={loading} />
+      <div className="flex justify-center gap-4">
+        <Button label="FAZER DOWNLOAD DO DOCX" variant="primary" onClick={() => handleDownload("docx")} disabled={loading} />
+        <Button label="FAZER DOWNLOAD DO PDF" variant="outline" onClick={() => handleDownload("pdf")} disabled={loading} />
       </div>
     </section>
   );
