@@ -53,7 +53,7 @@ function getTemplate(payload: DocxApiRequest): DocxData["template"] {
 }
 
 function buildDocxData(payload: DocxApiRequest): DocxData {
-  const source = payload.dados ?? payload
+  const source = (payload.dados ?? payload) as Partial<DadosUsuario> & DocxApiRequest
   const template = getTemplate(payload)
 
   if (!source.nome && !source.nome_estudante) {

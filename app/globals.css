@@ -1,27 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  /* Azul principal */
   --color-primary: #1a1aff;
   --color-primary-dark: #1212cc;
   --color-primary-light: #4d4dff;
-
-  /* Vermelho botão */
   --color-danger: #e63329;
   --color-danger-dark: #c0271e;
-
-  /* Neutros */
   --color-neutral-white: #ffffff;
   --color-neutral-light: #f5f5f5;
   --color-neutral-dark: #1a1a2e;
-
-  /* Fonte */
-  --font-sans: "Inter", sans-serif;
-   --font-heading: "Playfair Display", serif;
+  --font-sans: Inter, sans-serif;
+  --font-heading: "Playfair Display", serif;
 }
 @layer base {
   body {
     font-family: var(--font-sans);
+    color: var(--color-neutral-dark);
+    background-color: var(--color-neutral-white);
   }
 
   h1, h2, h3 {
