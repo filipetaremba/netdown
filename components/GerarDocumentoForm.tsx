@@ -36,6 +36,7 @@ export default function GerarDocumentoForm() {
     anoPretendeLevantar: "",
     semestrePretendido: "",
     tipoDocumento: "",
+    contacto: "",
   });
 
   useEffect(() => {
@@ -92,6 +93,7 @@ export default function GerarDocumentoForm() {
         ano_pretende_levantar: Number(form.anoPretendeLevantar) || 0,
         semestre_pretendido: form.semestrePretendido,
         data_actual: new Date().toLocaleDateString("pt-MZ"),
+        contacto: form.contacto,
       },
     };
     const encoded = encodeURIComponent(JSON.stringify(payload));
@@ -144,6 +146,7 @@ export default function GerarDocumentoForm() {
               <Input label="Residência do Estudante" name="residencia" placeholder="Ex: Beira" value={form.residencia} onChange={handleChange} />
               <Input label="Província" name="provincia" placeholder="Ex: Sofala" value={form.provincia} onChange={handleChange} />
               <Input label="Nacionalidade" name="nacionalidade" placeholder="Ex: Moçambicana" value={form.nacionalidade} onChange={handleChange} />
+              <Input label="Contacto do Estudante" name="contacto" placeholder="Ex: 841234567" value={form.contacto} onChange={handleChange}/>
               <Input label="Período de Frequência" name="periodoFrequencia" placeholder="Ex: Laboral/Pos Laboral" value={form.periodoFrequencia} onChange={handleChange} />
               <Input label="Faculdade" name="faculdade" placeholder="Ex: Faculdade de Ciências e Tecnologias" value={form.faculdade} onChange={handleChange} />
               <Input label="Ano Lectivo" name="anoLectivo" placeholder="Ex: 2025" value={form.anoLectivo} onChange={handleChange} />
