@@ -43,7 +43,7 @@ export default function ProgressModal({ onComplete }: ProgressModalProps) {
           requestAnimationFrame(animate);
         } else {
           stageIndex++;
-          setTimeout(runStage, 50);
+          setTimeout(runStage, 100);
         }
       };
 
