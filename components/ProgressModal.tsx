@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 
 const stages = [
-  { label: "A processar o teu pedido...", duration: 1200 },
-  { label: "Por favor aguarda...", duration: 1200 },
-  { label: "Quase pronto...", duration: 1100 },
+  { label: "A processar o teu pedido...", duration: 300 },
+  { label: "Por favor aguarda...", duration: 250 },
+  { label: "Quase pronto...", duration: 250 },
 ];
 
 interface ProgressModalProps {
@@ -24,7 +24,7 @@ export default function ProgressModal({ onComplete }: ProgressModalProps) {
       if (stageIndex >= stages.length) {
         setProgress(100);
         setDone(true);
-        setTimeout(onComplete, 700);
+        setTimeout(onComplete, 300);
         return;
       }
 
@@ -43,7 +43,7 @@ export default function ProgressModal({ onComplete }: ProgressModalProps) {
           requestAnimationFrame(animate);
         } else {
           stageIndex++;
-          setTimeout(runStage, 200);
+          setTimeout(runStage, 50);
         }
       };
 
