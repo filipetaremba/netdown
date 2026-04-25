@@ -4,7 +4,6 @@ import fs from "fs";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import path from "path";
-import libreofficeConvert from "libreoffice-convert";
 
 type DocxData = {
   // Dados do estudante
@@ -95,23 +94,11 @@ export async function generateDocx(data: DocxData): Promise<Buffer> {
     throw new Error("Falha ao preencher o documento");
   }
 
+  // Sempre retornar DOCX - conversão para PDF é feita via CloudConvert no endpoint /api/convert
   const docxBuffer = doc.getZip().generate({
     type: "nodebuffer",
     compression: "DEFLATE",
   });
-
-  if (data.formato === "pdf") {
-    return await new Promise<Buffer>((resolve, reject) => {
-      libreofficeConvert.convert(docxBuffer, ".pdf", undefined, (err, done) => {
-        if (err) {
-          console.error("Erro na conversão para PDF:", err);
-          reject(new Error("Falha ao converter documento para PDF. Verifique se o LibreOffice está instalado."));
-          return;
-        }
-        resolve(done as Buffer);
-      });
-    });
-  }
 
   return docxBuffer;
 }

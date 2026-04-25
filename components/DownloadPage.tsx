@@ -52,34 +52,85 @@ export default function DownloadPage() {
     setError(null);
 
     try {
-      const downloadPayload = { ...payload, formato: format };
-      const response = await fetch("/api/docx", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(downloadPayload),
-      });
+      if (format === "docx") {
+        // Download direto DOCX
+        const downloadPayload = { ...payload, formato: format };
+        const response = await fetch("/api/docx", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(downloadPayload),
+        });
 
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text || "Erro ao gerar o documento");
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(text || "Erro ao gerar o documento");
+        }
+
+        const blob = await response.blob();
+        downloadFile(blob, "docx", payload.tipo, payload.dados.nome as string);
+      } else {
+        // PDF via CloudConvert
+        const downloadPayload = { ...payload, formato: "docx" };
+        
+        // 1. Gerar DOCX
+        const docxResponse = await fetch("/api/docx", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(downloadPayload),
+        });
+
+        if (!docxResponse.ok) {
+          const text = await docxResponse.text();
+          throw new Error(text || "Erro ao gerar o documento");
+        }
+
+        const docxBlob = await docxResponse.blob();
+
+        // 2. Enviar para CloudConvert
+        const formData = new FormData();
+        const fileName = `${payload.tipo}_${String(payload.dados.nome ?? "documento").replace(/\s+/g, "_").toLowerCase()}.docx`;
+        formData.append("file", docxBlob, fileName);
+        formData.append("fileName", fileName);
+
+        const convertResponse = await fetch("/api/convert", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!convertResponse.ok) {
+          const errorText = await convertResponse.text();
+          console.error('Erro CloudConvert:', errorText);
+          try {
+            const errorJson = JSON.parse(errorText);
+            throw new Error(errorJson.error || "Erro ao converter para PDF");
+          } catch (e) {
+            if (e instanceof SyntaxError) {
+              throw new Error(errorText || "Erro ao converter para PDF");
+            }
+            throw e;
+          }
+        }
+
+        const pdfBlob = await convertResponse.blob();
+        downloadFile(pdfBlob, "pdf", payload.tipo, payload.dados.nome as string);
       }
-
-      const blob = await response.blob();
-      const extension = format === "pdf" ? "pdf" : "docx";
-      const fileName = `${payload.tipo}_${String(payload.dados.nome ?? "documento").replace(/\s+/g, "_").toLowerCase()}.${extension}`;
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = fileName;
-      link.style.display = "none";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const downloadFile = (blob: Blob, extension: string, tipo: string, nome: string) => {
+    const fileName = `${tipo}_${String(nome ?? "documento").replace(/\s+/g, "_").toLowerCase()}.${extension}`;
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
   };
 
   if (!tipoLabel) return null;
@@ -98,6 +149,7 @@ export default function DownloadPage() {
       {error && <p className="text-red-600 mb-4">{error}</p>}
       <div className="flex justify-center gap-4">
         <Button label="FAZER DOWNLOAD DO DOCX" variant="primary" onClick={() => handleDownload("docx")} disabled={loading} />
+        <Button label="FAZER DOWNLOAD DO PDF" variant="primary" onClick={() => handleDownload("pdf")} disabled={loading} />
       </div>
     </section>
   );
