@@ -21,6 +21,19 @@ const PROVINCIAS = [
   "Niassa","Sofala","Tete","Zambézia",
 ]
 
+const PERIODOS = ["Laboral", "Pós-Laboral"]
+
+const FACULDADES = [
+  "Faculdade de Direito",
+  "Faculdade de Ciências e Tecnologia",
+  "Faculdade de Ciências Sociais e Humanidades",
+  "Faculdade de Engenharia Agronómica e Florestal",
+  "Faculdade de Ciências Agrárias",
+  "Faculdade de Ciências Agrárias — Ulóngue-Angónia, Tete",
+  "Faculdade de Ciências de Saúde — Tete",
+  "Faculdade de Engenharia Ambiental e dos Recursos Naturais",
+]
+
 // ── Autocomplete de Província ──────────────────────────────────────────────
 function ProvinciaField({
   value,
@@ -168,6 +181,71 @@ function TipoDropdown({
   )
 }
 
+// ── Dropdown genérico reutilizável ─────────────────────────────────────────
+function SimpleDropdown({
+  label,
+  value,
+  options,
+  onChange,
+  placeholder = "Selecione...",
+}: {
+  label: string
+  value: string
+  options: string[]
+  onChange: (val: string) => void
+  placeholder?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
+
+  return (
+    <div className="flex flex-col gap-1 relative" ref={ref}>
+      <label className="text-xs font-medium text-[#1a3fcf] uppercase tracking-wide">
+        {label}
+      </label>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between border-b border-blue-300 py-2 text-sm outline-none focus:border-[#1a3fcf] bg-transparent text-left transition-colors w-full"
+      >
+        <span className={value ? "text-gray-800" : "text-gray-300"}>
+          {value || placeholder}
+        </span>
+        <svg
+          className={`w-3.5 h-3.5 shrink-0 text-[#1a3fcf] transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <ul className="absolute top-full left-0 right-0 z-20 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 overflow-hidden">
+          {options.map((opt) => (
+            <li
+              key={opt}
+              onMouseDown={() => { onChange(opt); setOpen(false) }}
+              className={`px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-[#1a3fcf] hover:text-white ${
+                opt === value ? "bg-[#1a3fcf]/10 text-[#1a3fcf] font-semibold" : "text-gray-700"
+              }`}
+            >
+              {opt}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 // ── Página principal ───────────────────────────────────────────────────────
 export default function FormularioClient() {
   const router = useRouter()
@@ -243,13 +321,23 @@ export default function FormularioClient() {
             <FormField label="Nacionalidade" name="nacionalidade"
               value={dados.nacionalidade || "Moçambicana"} onChange={handle("nacionalidade")} />
 
-            <FormField label="Período de Frequência" name="periodo"
-              placeholder="Ex: Diurno"
-              value={dados.periodo || ""} onChange={handle("periodo")} />
+            <SimpleDropdown
+              label="Período de Frequência"
+              value={dados.periodo || ""}
+              options={PERIODOS}
+              placeholder="Selecione o período"
+              onChange={(val) => setDados({ periodo: val })}
+            />
 
-            <FormField label="Faculdade" name="faculdade"
-              placeholder="Ex: Faculdade de Ciências e Tecnologia"
-              value={dados.faculdade || ""} onChange={handle("faculdade")} />
+            <div className="md:col-span-2">
+              <SimpleDropdown
+                label="Faculdade"
+                value={dados.faculdade || ""}
+                options={FACULDADES}
+                placeholder="Selecione a faculdade"
+                onChange={(val) => setDados({ faculdade: val })}
+              />
+            </div>
 
             <FormField label="Ano Lectivo" name="ano_lectivo"
               placeholder="Ex: 2026"
@@ -259,9 +347,11 @@ export default function FormularioClient() {
               placeholder="Ex: 20242321"
               value={dados.registo_n || ""} onChange={handle("registo_n")} />
 
-            <FormField label="Curso" name="curso"
-              placeholder="Ex: Engenharia Informática"
-              value={dados.curso || ""} onChange={handle("curso")} />
+            <div className="md:col-span-2">
+              <FormField label="Curso" name="curso"
+                placeholder="Ex: Engenharia Informática"
+                value={dados.curso || ""} onChange={handle("curso")} />
+            </div>
 
             <FormField label="Ano Actual" name="ano_actual" type="number"
               placeholder="Ex: 3"
