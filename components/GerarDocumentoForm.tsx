@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Input from "@/components/Input";
 import Select from "@/components/Select";
@@ -14,6 +14,92 @@ const documentTypes = [
   { label: "Diploma", value: "diploma" },
 ];
 
+const PERIODOS = ["Laboral", "Pós-Laboral"];
+
+const FACULDADES = [
+  { label: "FD", value: "Faculdade de Direito" },
+  { label: "FCT", value: "Faculdade de Ciências e Tecnologia" },
+  { label: "FCSH", value: "Faculdade de Ciências Sociais e Humanidades" },
+  { label: "FEAF", value: "Faculdade de Engenharia Agronómica e Florestal" },
+  { label: "FCA", value: "Faculdade de Ciências Agrárias" },
+  { label: "FCA" , value: "Faculdade de Ciências Agrárias — Ulóngue-Angónia, Tete" },
+  { label: "FCS", value: "Faculdade de Ciências de Saúde — Tete" },
+  { label: "FEARN", value: "Faculdade de Engenharia Ambiental e dos Recursos Naturais" },
+]
+
+// ── Dropdown genérico reutilizável ─────────────────────────────────────────
+function SimpleDropdown({
+  label,
+  value,
+  options,
+  onChange,
+  placeholder = "Selecione...",
+}: {
+  label: string;
+  value: string;
+  options: { label: string; value: string }[] | string[];
+  onChange: (val: string) => void;
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Normaliza para sempre { label, value }
+  const normalised = (options as (string | { label: string; value: string })[]).map((o) =>
+    typeof o === "string" ? { label: o, value: o } : o
+  );
+
+  const selected = normalised.find((o) => o.value === value);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-1 relative" ref={ref}>
+      <label className="text-primary text-xs font-semibold uppercase tracking-widest font-heading">
+        {label}
+      </label>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between border border-primary/30 rounded px-3 py-2.5 text-sm outline-none focus:border-primary bg-white text-left transition-colors w-full"
+      >
+        <span className={value ? "text-gray-800" : "text-gray-400"}>
+          {selected?.label || placeholder}
+        </span>
+        <svg
+          className={`w-3.5 h-3.5 shrink-0 text-primary transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <ul className="absolute top-full left-0 right-0 z-20 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 overflow-hidden">
+          {normalised.map((opt) => (
+           <li
+              key={opt.value}
+              onMouseDown={() => { onChange(opt.value); setOpen(false); }}
+              className={`px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-primary hover:text-white ${
+                opt.value === value ? "bg-primary/10 text-primary font-semibold" : "text-gray-700"
+              }`}
+            >
+              {opt.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// ── Componente principal ───────────────────────────────────────────────────
 export default function GerarDocumentoForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -36,6 +122,7 @@ export default function GerarDocumentoForm() {
     anoPretendeLevantar: "",
     semestrePretendido: "",
     tipoDocumento: "",
+    contacto: "",
   });
 
   useEffect(() => {
@@ -92,13 +179,14 @@ export default function GerarDocumentoForm() {
         ano_pretende_levantar: Number(form.anoPretendeLevantar) || 0,
         semestre_pretendido: form.semestrePretendido,
         data_actual: new Date().toLocaleDateString("pt-MZ"),
+        contacto: form.contacto,
       },
     };
     const encoded = encodeURIComponent(JSON.stringify(payload));
     router.push(`/download?data=${encoded}`);
   }, [form, router]);
 
-  const documentoSelecionado = documentTypes.find(d => d.value === form.tipoDocumento);
+  const documentoSelecionado = documentTypes.find((d) => d.value === form.tipoDocumento);
 
   return (
     <>
@@ -137,19 +225,61 @@ export default function GerarDocumentoForm() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Input label="Nome" name="nome" placeholder="Ex: João Silva" value={form.nome} onChange={handleChange} />
-              <Input label="Numero de Bilhete de Identidade" name="numeroBilhete" placeholder="Ex: 123456789A" value={form.numeroBilhete} onChange={handleChange} />
-              <Input label="Local de Emissão" name="localEmissao" placeholder="Ex: Beira" value={form.localEmissao} onChange={handleChange} />
-              <Input label="Data de Emissão" name="dataEmissao" type="date" value={form.dataEmissao} onChange={handleChange} />
-              <Input label="Residência do Estudante" name="residencia" placeholder="Ex: Beira" value={form.residencia} onChange={handleChange} />
-              <Input label="Província" name="provincia" placeholder="Ex: Sofala" value={form.provincia} onChange={handleChange} />
-              <Input label="Nacionalidade" name="nacionalidade" placeholder="Ex: Moçambicana" value={form.nacionalidade} onChange={handleChange} />
-              <Input label="Período de Frequência" name="periodoFrequencia" placeholder="Ex: Laboral/Pos Laboral" value={form.periodoFrequencia} onChange={handleChange} />
-              <Input label="Faculdade" name="faculdade" placeholder="Ex: Faculdade de Ciências e Tecnologias" value={form.faculdade} onChange={handleChange} />
-              <Input label="Ano Lectivo" name="anoLectivo" placeholder="Ex: 2025" value={form.anoLectivo} onChange={handleChange} />
-              <Input label="Número do Estudante" name="numeroEstudante" placeholder="Ex: 2021001234" value={form.numeroEstudante} onChange={handleChange} />
-              <Input label="Curso" name="curso" placeholder="Ex: Engenharia Informática" value={form.curso} onChange={handleChange} />
-              <Input label="Ano" name="ano" placeholder="Ex: 4" value={form.ano} onChange={handleChange} />
+
+              <Input label="Nome" name="nome" placeholder="Ex: João Silva"
+                value={form.nome} onChange={handleChange} />
+
+              <Input label="Numero de Bilhete de Identidade" name="numeroBilhete"
+                placeholder="Ex: 123456789A" value={form.numeroBilhete} onChange={handleChange} />
+
+              <Input label="Local de Emissão" name="localEmissao"
+                placeholder="Ex: Beira" value={form.localEmissao} onChange={handleChange} />
+
+              <Input label="Data de Emissão" name="dataEmissao" type="date"
+                value={form.dataEmissao} onChange={handleChange} />
+
+              <Input label="Residência do Estudante" name="residencia"
+                placeholder="Ex: Beira" value={form.residencia} onChange={handleChange} />
+
+              <Input label="Província" name="provincia"
+                placeholder="Ex: Sofala" value={form.provincia} onChange={handleChange} />
+
+              <Input label="Nacionalidade" name="nacionalidade"
+                placeholder="Ex: Moçambicana" value={form.nacionalidade} onChange={handleChange} />
+
+              <Input label="Contacto do Estudante" name="contacto"
+                placeholder="Ex: 841234567" value={form.contacto} onChange={handleChange} />
+
+              {/* ── Período de Frequência — dropdown ── */}
+              <SimpleDropdown
+                label="Período de Frequência"
+                value={form.periodoFrequencia}
+                options={PERIODOS}
+                placeholder="Selecione o período"
+                onChange={(val) => setForm((prev) => ({ ...prev, periodoFrequencia: val }))}
+              />
+
+                <SimpleDropdown
+                  label="Faculdade"
+                  value={form.faculdade}
+                  options={FACULDADES}
+                  placeholder="Selecione a faculdade"
+                  onChange={(val) => setForm((prev) => ({ ...prev, faculdade: val }))}
+                />
+
+              <Input label="Ano Lectivo" name="anoLectivo"
+                placeholder="Ex: 2025" value={form.anoLectivo} onChange={handleChange} />
+
+              <Input label="Número do Estudante" name="numeroEstudante"
+                placeholder="Ex: 2021001234" value={form.numeroEstudante} onChange={handleChange} />
+
+              <div className="md:col-span-2">
+                <Input label="Curso" name="curso"
+                  placeholder="Ex: Engenharia Informática" value={form.curso} onChange={handleChange} />
+              </div>
+
+              <Input label="Ano" name="ano"
+                placeholder="Ex: 4" value={form.ano} onChange={handleChange} />
 
               {form.tipoDocumento === "rendimento-pedagogico" && (
                 <>
@@ -189,6 +319,7 @@ export default function GerarDocumentoForm() {
                   {documentoSelecionado?.label}
                 </div>
               </div>
+
             </div>
 
             <div className="flex justify-center mt-12">

@@ -66,7 +66,6 @@ function getTemplate(payload: DocxApiRequest): DocxData["template"] {
 function buildDocxData(payload: DocxApiRequest): DocxData {
   const source = (payload.dados ?? payload) as Partial<DadosUsuario> & DocxApiRequest
   const template = getTemplate(payload)
-  const formato = payload.formato === "pdf" ? "pdf" : "docx"
 
   if (!source.nome && !source.nome_estudante) {
     throw new Error("Campo 'nome' é obrigatório")
@@ -88,7 +87,7 @@ function buildDocxData(payload: DocxApiRequest): DocxData {
     data_do_dia: source.data_actual || source.data_do_dia || new Date().toLocaleDateString("pt-MZ"),
     contacto_estudante: source.contacto || source.contacto_estudante || "",
     template,
-    formato,
+    formato: "docx",
   }
 }
 
