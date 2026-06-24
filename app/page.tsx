@@ -8,13 +8,13 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <main>
+    <main className="flex flex-col min-h-screen">
       <Navbar />
-      <section id="inicio"><HeroSection /></section>
-      <section id="como-funciona"><HowItWorks /></section>
-      <section id="requerimentos"><Documents /></section>
+      <section id="inicio"><HeroSection/></section>
+      <section id="como-funciona"><HowItWorks/></section>
+      <section id="requerimentos"><Documents/></section>
        <CTA />
-      <section id="contacto"><Contact /></section>
+      <section id="contacto"><Contact/></section>
       <Footer />
     </main>
   );

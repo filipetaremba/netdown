@@ -2,7 +2,7 @@ import Button from "./Button";
 
 export default function HeroSection() {
   return (
-    <section className="w-full min-h-screen flex flex-col items-center justify-center text-center px-6 md:px-20">
+    <section className="w-full min-h-[75vh] md:min-h-screen flex flex-col items-center justify-center text-center px-6 md:px-20">
 
       {/* Título */}
       <h1 className="text-primary font-bold text-3xl md:text-5xl leading-tight font-heading max-w-xs md:max-w-3xl"

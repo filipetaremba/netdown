@@ -5,9 +5,9 @@ import Button from "@/components/Button";
 import Link from 'next/link';
 
 const navLinks = [
-  {label: "INICIO",href: "#inicio"},
-  {label: "COMO FUNCIONA",href: "#como-funciona"},
-  {label: "REQUERIMENTOS", href: "#requerimentos"}
+  {label: "INICIO",href: "/#inicio"},
+  {label: "COMO FUNCIONA",href: "/#como-funciona"},
+  {label: "REQUERIMENTOS", href: "/#requerimentos"}
   ];
 
 export default function Navbar() {
@@ -39,11 +39,14 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
+
+        </div>
+
+        <div className="hidden md:flex items-center">
           <a href="/gerar-documento">
             <Button label="Gerar Requerimento" variant="primary" />
           </a>
         </div>
-
         {/* Mobile — Botão Hamburguer */}
         <button
           className="md:hidden text-neutral-white focus:outline-none"
