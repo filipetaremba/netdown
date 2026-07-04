@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Input from "@/components/Input";
+import { formatDateLongPortuguese } from "@/lib/date";
 import Select from "@/components/Select";
 import Button from "@/components/Button";
 import ProgressModal from "@/components/ProgressModal";
@@ -15,6 +16,19 @@ const documentTypes = [
 ];
 
 const PERIODOS = ["Laboral", "Pós-Laboral"];
+
+const PROVINCIAS = [
+  "Cabo Delgado",
+  "Gaza",
+  "Inhambane",
+  "Manica",
+  "Maputo",
+  "Nampula",
+  "Niassa",
+  "Sofala",
+  "Tete",
+  "Zambézia",
+];
 
 const FACULDADES = [
   { label: "FD", value: "Faculdade de Direito" },
@@ -104,6 +118,7 @@ export default function GerarDocumentoForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
+  const currentYear = new Date().getFullYear().toString();
 
   const [form, setForm] = useState({
     nome: "",
@@ -112,13 +127,13 @@ export default function GerarDocumentoForm() {
     dataEmissao: "",
     residencia: "",
     provincia: "",
-    nacionalidade: "",
+    nacionalidade: "Moçambicana",
     periodoFrequencia: "",
     faculdade: "",
-    anoLectivo: "",
+    anoLectivo: currentYear,
     numeroEstudante: "",
     curso: "",
-    ano: "",
+    ano: currentYear,
     anoPretendeLevantar: "",
     semestrePretendido: "",
     tipoDocumento: "",
@@ -169,16 +184,16 @@ export default function GerarDocumentoForm() {
         bi_emissao_data: form.dataEmissao,
         cidade: form.residencia,
         provincia: form.provincia,
-        nacionalidade: form.nacionalidade,
+        nacionalidade: form.nacionalidade || "Moçambicana",
         periodo: form.periodoFrequencia,
         faculdade: form.faculdade,
-        ano_lectivo: form.anoLectivo,
+        ano_lectivo: form.anoLectivo || currentYear,
         registo_n: form.numeroEstudante,
         curso: form.curso,
-        ano_actual: Number(form.ano) || 0,
+        ano_actual: Number(form.ano || currentYear) || new Date().getFullYear(),
         ano_pretende_levantar: Number(form.anoPretendeLevantar) || 0,
         semestre_pretendido: form.semestrePretendido,
-        data_actual: new Date().toLocaleDateString("pt-MZ"),
+        data_actual: formatDateLongPortuguese(new Date()),
         contacto: form.contacto,
       },
     };
@@ -226,101 +241,99 @@ export default function GerarDocumentoForm() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-              <Input label="Nome" name="nome" placeholder="Ex: João Silva"
-                value={form.nome} onChange={handleChange} />
+  {/* ── Dados Pessoais ── */}
+  <Input label="Nome" name="nome" placeholder="Ex: João Silva"
+    value={form.nome} onChange={handleChange} />
 
-              <Input label="Numero de Bilhete de Identidade" name="numeroBilhete"
-                placeholder="Ex: 123456789A" value={form.numeroBilhete} onChange={handleChange} />
+  <Input label="Numero de Bilhete de Identidade" name="numeroBilhete"
+    placeholder="Ex: 123456789A" value={form.numeroBilhete} onChange={handleChange} />
 
-              <Input label="Local de Emissão" name="localEmissao"
-                placeholder="Ex: Beira" value={form.localEmissao} onChange={handleChange} />
+  <Input label="Local de Emissão" name="localEmissao"
+    placeholder="Ex: Beira" value={form.localEmissao} onChange={handleChange} />
 
-              <Input label="Data de Emissão" name="dataEmissao" type="date"
-                value={form.dataEmissao} onChange={handleChange} />
+  <Input label="Data de Emissão" name="dataEmissao" type="date"
+    value={form.dataEmissao} onChange={handleChange} />
 
-              <Input label="Residência do Estudante" name="residencia"
-                placeholder="Ex: Beira" value={form.residencia} onChange={handleChange} />
+  <Input label="Residência do Estudante" name="residencia"
+    placeholder="Ex: Beira" value={form.residencia} onChange={handleChange} />
 
-              <Input label="Província" name="provincia"
-                placeholder="Ex: Sofala" value={form.provincia} onChange={handleChange} />
+  <SimpleDropdown
+    label="Província"
+    value={form.provincia}
+    options={PROVINCIAS}
+    placeholder="Selecione a província"
+    onChange={(val) => setForm((prev) => ({ ...prev, provincia: val }))}
+  />
 
-              <Input label="Nacionalidade" name="nacionalidade"
-                placeholder="Ex: Moçambicana" value={form.nacionalidade} onChange={handleChange} />
+  <Input label="Contacto do Estudante" name="contacto"
+    placeholder="Ex: 841234567" value={form.contacto} onChange={handleChange} />
 
-              <Input label="Contacto do Estudante" name="contacto"
-                placeholder="Ex: 841234567" value={form.contacto} onChange={handleChange} />
+  <SimpleDropdown
+    label="Período de Frequência"
+    value={form.periodoFrequencia}
+    options={PERIODOS}
+    placeholder="Selecione o período"
+    onChange={(val) => setForm((prev) => ({ ...prev, periodoFrequencia: val }))}
+  />
 
-              {/* ── Período de Frequência — dropdown ── */}
-              <SimpleDropdown
-                label="Período de Frequência"
-                value={form.periodoFrequencia}
-                options={PERIODOS}
-                placeholder="Selecione o período"
-                onChange={(val) => setForm((prev) => ({ ...prev, periodoFrequencia: val }))}
-              />
+  {/* ── Dados Académicos ── */}
+  <SimpleDropdown
+    label="Faculdade"
+    value={form.faculdade}
+    options={FACULDADES}
+    placeholder="Selecione a faculdade"
+    onChange={(val) => setForm((prev) => ({ ...prev, faculdade: val }))}
+  />
 
-                <SimpleDropdown
-                  label="Faculdade"
-                  value={form.faculdade}
-                  options={FACULDADES}
-                  placeholder="Selecione a faculdade"
-                  onChange={(val) => setForm((prev) => ({ ...prev, faculdade: val }))}
-                />
+  <Input label="Ano Lectivo" name="anoLectivo"
+    placeholder="Ex: 2025" value={form.anoLectivo} onChange={handleChange} />
 
-              <Input label="Ano Lectivo" name="anoLectivo"
-                placeholder="Ex: 2025" value={form.anoLectivo} onChange={handleChange} />
+  <Input label="Número do Estudante" name="numeroEstudante"
+    placeholder="Ex: 2021001234" value={form.numeroEstudante} onChange={handleChange} />
 
-              <Input label="Número do Estudante" name="numeroEstudante"
-                placeholder="Ex: 2021001234" value={form.numeroEstudante} onChange={handleChange} />
+  <Input label="Curso" name="curso"
+    placeholder="Ex: Engenharia Informática" value={form.curso} onChange={handleChange} />
 
-              <div className="md:col-span-2">
-                <Input label="Curso" name="curso"
-                  placeholder="Ex: Engenharia Informática" value={form.curso} onChange={handleChange} />
-              </div>
+  {form.tipoDocumento === "rendimento-pedagogico" && (
+    <>
+      <Input
+        label="Ano que pretende levantar"
+        name="anoPretendeLevantar"
+        type="number"
+        placeholder="Ex: 3"
+        value={form.anoPretendeLevantar}
+        onChange={handleChange}
+      />
 
-              <Input label="Ano" name="ano"
-                placeholder="Ex: 4" value={form.ano} onChange={handleChange} />
+      <div className="flex flex-col gap-1">
+        <label className="text-primary text-xs font-semibold uppercase tracking-widest font-heading">
+          Semestre pretendido
+        </label>
+        <select
+          name="semestrePretendido"
+          value={form.semestrePretendido}
+          onChange={handleChange}
+          className="border border-primary/30 rounded px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 bg-white transition-colors duration-200"
+        >
+          <option value="">Selecione o semestre</option>
+          <option value="1º Semestre">1º Semestre</option>
+          <option value="2º Semestre">2º Semestre</option>
+          <option value="1º e 2º Semestre">1º e 2º Semestre</option>
+        </select>
+      </div>
+    </>
+  )}
 
-              {form.tipoDocumento === "rendimento-pedagogico" && (
-                <>
-                  <Input
-                    label="Ano que pretende levantar"
-                    name="anoPretendeLevantar"
-                    type="number"
-                    placeholder="Ex: 3"
-                    value={form.anoPretendeLevantar}
-                    onChange={handleChange}
-                  />
+  <div className="flex flex-col gap-1 w-full md:col-span-2">
+    <label className="text-primary text-xs font-semibold uppercase tracking-widest font-heading">
+      Minuta para Pedido de
+    </label>
+    <div className="w-full px-4 py-2 bg-primary rounded text-neutral-white text-sm font-heading font-semibold uppercase tracking-widest text-center">
+      {documentoSelecionado?.label}
+    </div>
+  </div>
 
-                  <div className="flex flex-col gap-1">
-                    <label className="text-primary text-xs font-semibold uppercase tracking-widest font-heading">
-                      Semestre pretendido
-                    </label>
-                    <select
-                      name="semestrePretendido"
-                      value={form.semestrePretendido}
-                      onChange={handleChange}
-                      className="border border-primary/30 rounded px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 bg-white transition-colors duration-200"
-                    >
-                      <option value="">Selecione o semestre</option>
-                      <option value="1º Semestre">1º Semestre</option>
-                      <option value="2º Semestre">2º Semestre</option>
-                      <option value="1º e 2º Semestre">1º e 2º Semestre</option>
-                    </select>
-                  </div>
-                </>
-              )}
-
-              <div className="flex flex-col gap-1 w-full">
-                <label className="text-primary text-xs font-semibold uppercase tracking-widest font-heading">
-                  Minuta para Pedido de
-                </label>
-                <div className="w-full px-4 py-2 bg-primary rounded text-neutral-white text-sm font-heading font-semibold uppercase tracking-widest text-center">
-                  {documentoSelecionado?.label}
-                </div>
-              </div>
-
-            </div>
+</div>
 
             <div className="flex justify-center mt-12">
               <Button label="GERAR DOCUMENTO" variant="primary" onClick={handleSubmit} />

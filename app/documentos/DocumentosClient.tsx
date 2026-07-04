@@ -16,6 +16,7 @@ const documentTypes = [
 
 export default function DocumentosClient() {
   const searchParams = useSearchParams();
+  const currentYear = new Date().getFullYear().toString();
 
   const [form, setForm] = useState({
     nome: "",
@@ -24,13 +25,13 @@ export default function DocumentosClient() {
     dataEmissao: "",
     residencia: "",
     provincia: "",
-    nacionalidade: "",
+    nacionalidade: "Moçambicana",
     periodoFrequencia: "",
     faculdade: "",
-    anoLectivo: "",
+    anoLectivo: currentYear,
     numeroEstudante: "",
     curso: "",
-    ano: "",
+    ano: currentYear,
     tipoDocumento: "",
   });
 
@@ -97,7 +98,6 @@ export default function DocumentosClient() {
               <Input label="Data de Emissão" name="dataEmissao" type="date" value={form.dataEmissao} onChange={handleChange} />
               <Input label="Residência do Estudante" name="residencia" placeholder="Ex: Beira" value={form.residencia} onChange={handleChange} />
               <Input label="Província" name="provincia" placeholder="Ex: Sofala" value={form.provincia} onChange={handleChange} />
-              <Input label="Nacionalidade" name="nacionalidade" placeholder="Ex: Moçambicana" value={form.nacionalidade} onChange={handleChange} />
               <Input
                 label="Período de Frequência"
                 name="periodoFrequencia"
@@ -115,7 +115,6 @@ export default function DocumentosClient() {
                 onChange={handleChange}
               />
               <Input label="Curso" name="curso" placeholder="Ex: Engenharia Informática" value={form.curso} onChange={handleChange} />
-              <Input label="Ano" name="ano" placeholder="Ex: 4" value={form.ano} onChange={handleChange} />
 
               <div className="flex flex-col gap-1 w-full">
                 <label className="text-primary text-xs font-semibold uppercase tracking-widest font-heading">

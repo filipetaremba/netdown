@@ -12,7 +12,9 @@ export interface DadosUsuario {
   bi_emissao_local: string
   bi_emissao_data: string
   cidade: string
+  cidade_residencia?: string
   provincia: string
+  provincia_residencia?: string
   nacionalidade: string
   periodo: string
   faculdade: string
@@ -20,6 +22,7 @@ export interface DadosUsuario {
   registo_n: string
   curso: string
   ano_actual: number
+  ano_do_curso?: string | number
   ano_pretende_levantar: number
   semestre_pretendido: string
   justificativo: string

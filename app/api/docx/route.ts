@@ -1,4 +1,5 @@
 ﻿import { generateDocx } from "../../../lib/gerarDocument"
+import { formatDateLongPortuguese } from "@/lib/date"
 import type { DadosUsuario, TipoDocumento } from "@/lib/types"
 
 type DocxApiRequest = {
@@ -10,6 +11,7 @@ type DocxApiRequest = {
   cidade_emissaoBI?: string
   data_emissaoBI?: string
   provincia_emissaoBI?: string
+  nacionalidade?: string
   periodo_frequentado?: string
   faculdade_?: string
   ano_actual?: string | number
@@ -19,6 +21,10 @@ type DocxApiRequest = {
   semestre_pretendido?: string
   data_do_dia?: string
   contacto_estudante?: string
+  cidade_residencia?: string
+  provincia_residencia?: string
+  ano_lectivo?: string | number
+  ano_do_curso?: string | number
   formato?: "docx" | "pdf"
 }
 
@@ -28,11 +34,16 @@ type DocxData = {
   cidade_emissaoBI: string
   data_emissaoBI: string
   provincia_emissaoBI: string
+  cidade_residencia: string
+  provincia_residencia: string
+  nacionalidade: string
   periodo_frequentado: string
   faculdade_: string
   ano_actual: string
+  ano_lectivo: string
   codigo_estudante: string
   curso_frequentado: string
+  ano_do_curso: string
   ano_pretende_levantar: number
   semestre_pretendido: string
   data_do_dia: string
@@ -75,16 +86,21 @@ function buildDocxData(payload: DocxApiRequest): DocxData {
     nome_estudante: source.nome || source.nome_estudante || "",
     numero_BI: source.bi_numero || source.numero_BI || "",
     cidade_emissaoBI: source.bi_emissao_local || source.cidade_emissaoBI || "",
-    data_emissaoBI: source.bi_emissao_data || source.data_emissaoBI || "",
+    data_emissaoBI: formatDateLongPortuguese(source.bi_emissao_data || source.data_emissaoBI),
     provincia_emissaoBI: source.provincia || source.provincia_emissaoBI || "",
+    cidade_residencia: source.cidade_residencia || source.cidade || source.cidade_emissaoBI || "",
+    provincia_residencia: source.provincia_residencia || source.provincia || source.provincia_emissaoBI || "",
+    nacionalidade: source.nacionalidade || "moçambicana",
     periodo_frequentado: source.periodo || source.periodo_frequentado || "",
     faculdade_: source.faculdade || source.faculdade_ || "",
-    ano_actual: String(source.ano_actual ?? ""),
+    ano_actual: String(source.ano_actual ?? new Date().getFullYear()),
+    ano_lectivo: String(source.ano_lectivo ?? source.ano_actual ?? new Date().getFullYear()),
     codigo_estudante: source.registo_n || source.codigo_estudante || "",
     curso_frequentado: source.curso || source.curso_frequentado || "",
+    ano_do_curso: String(source.ano_do_curso ?? source.ano_actual ?? new Date().getFullYear()),
     ano_pretende_levantar: Number(source.ano_pretende_levantar ?? source.ano_lectivo ?? 0),
     semestre_pretendido: source.semestre_pretendido || "",
-    data_do_dia: source.data_actual || source.data_do_dia || new Date().toLocaleDateString("pt-MZ"),
+    data_do_dia: formatDateLongPortuguese(source.data_actual || source.data_do_dia),
     contacto_estudante: source.contacto || source.contacto_estudante || "",
     template,
     formato: "docx",
