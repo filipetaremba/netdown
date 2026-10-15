@@ -1,24 +1,29 @@
+import { FileText, PencilLine, Settings2, Download } from "lucide-react";
 import StepCard from "./StepCard";
 
 const steps = [
   {
     step: 1,
     title: "Selecione o Documento",
+    icon: FileText,
     description: "Escolha o tipo de requerimento académico que pretende gerar.",
   },
   {
     step: 2,
     title: "Preencha os Dados",
+    icon: PencilLine,
     description: "Introduza as suas informações académicas de forma simples e rápida.",
   },
   {
     step: 3,
     title: "Gerar o Documento",
+    icon: Settings2,
     description: "O sistema processa automaticamente os dados e cria o documento.",
   },
   {
     step: 4,
     title: "Faça o Download",
+    icon: Download,
     description: "O ficheiro é disponibilizado pronto para utilização.",
   },
 ];
@@ -45,11 +50,18 @@ export default function HowItWorks() {
       </p>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-6xl">
+      <div className="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-6xl">
+        {/* Linha que liga os passos (desktop) */}
+        <div
+          aria-hidden="true"
+          className="hidden md:block absolute top-[50px] left-[12.5%] right-[12.5%] border-t-2 border-dashed border-primary/25"
+        ></div>
+
         {steps.map((item) => (
           <StepCard
             key={item.step}
             step={item.step}
+            icon={item.icon}
             title={item.title}
             description={item.description}
           />

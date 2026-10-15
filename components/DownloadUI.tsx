@@ -8,6 +8,7 @@ const documentLabels: Record<string, string> = {
   "rendimento-pedagogico": "Rendimento Pedagógico",
   "declaracao-vinculo": "Declaração de Vínculo",
   "certificado-conclusao": "Certificado de Conclusão",
+  "carta-estagio": "Carta de Estágio",
   "diploma": "Diploma",
 };
 
@@ -115,7 +116,8 @@ export default function DownloadPage() {
         downloadFile(pdfBlob, "pdf", payload.tipo, payload.dados.nome as string);
       }
     } catch (err) {
-      setError((err as Error).message);
+      const message = err instanceof Error ? err.message : "Erro ao gerar o documento";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -146,7 +148,11 @@ export default function DownloadPage() {
         </p>
       </div>
 
-      {error && <p className="text-red-600 mb-4">{error}</p>}
+      {error && (
+        <div className="max-w-xl mx-auto mb-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
       <div className="flex justify-center gap-4">
         <Button label="FAZER DOWNLOAD DO DOCX" variant="primary" onClick={() => handleDownload("docx")} disabled={loading} />
         <Button label="FAZER DOWNLOAD DO PDF" variant="primary" onClick={() => handleDownload("pdf")} disabled={loading} />

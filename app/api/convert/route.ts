@@ -1,19 +1,29 @@
 import CloudConvert from 'cloudconvert';
 import { Readable } from 'stream';
 
-const cloudConvert = new CloudConvert(process.env.CLOUDCONVERT_API_KEY!);
+function getCloudConvertClient() {
+  const apiKey = process.env.CLOUDCONVERT_API_KEY;
+  if (!apiKey) {
+    throw new Error('CLOUDCONVERT_API_KEY não configurada');
+  }
+
+  return new CloudConvert(apiKey);
+}
 
 export async function POST(req: Request) {
   try {
     // Validar API Key
     if (!process.env.CLOUDCONVERT_API_KEY) {
       console.error('CLOUDCONVERT_API_KEY não definida');
-      return new Response(JSON.stringify({ error: 'CLOUDCONVERT_API_KEY não configurada' }), {
-        status: 500,
+      return new Response(JSON.stringify({
+        error: 'Conversão para PDF indisponível: variável CLOUDCONVERT_API_KEY não configurada.',
+      }), {
+        status: 503,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
+    const cloudConvert = getCloudConvertClient();
     const formData = await req.formData();
     const docxFile = formData.get('file') as File;
     const fileName = formData.get('fileName') as string || 'document.docx';

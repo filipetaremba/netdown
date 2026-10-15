@@ -3,8 +3,9 @@ export type TipoDocumento =
   | "declaracao_vinculo"
   | "rendimento_pedagogico"
   | "certificado_conclusao"
+  | "carta_estagio"
 
-export type DocxTemplate = "rendimento" | "declaracao" | "certificado"
+export type DocxTemplate = "rendimento" | "declaracao" | "certificado" | "carta_estagio"
 
 export interface DadosUsuario {
   nome: string
@@ -29,6 +30,7 @@ export interface DadosUsuario {
   contacto: string
   data_actual: string
   tipo: TipoDocumento
+  empresa_estagio?: string
 }
 
 export interface DocxRequestPayload {

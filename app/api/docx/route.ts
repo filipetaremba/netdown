@@ -4,7 +4,7 @@ import type { DadosUsuario, TipoDocumento } from "@/lib/types"
 
 type DocxApiRequest = {
   tipo?: TipoDocumento
-  template?: "rendimento" | "declaracao" | "certificado"
+  template?: "rendimento" | "declaracao" | "certificado" | "carta_estagio"
   dados?: Partial<DadosUsuario>
   nome_estudante?: string
   numero_BI?: string
@@ -26,6 +26,7 @@ type DocxApiRequest = {
   ano_lectivo?: string | number
   ano_do_curso?: string | number
   formato?: "docx" | "pdf"
+  empresa_estagio?: string
 }
 
 type DocxData = {
@@ -48,7 +49,8 @@ type DocxData = {
   semestre_pretendido: string
   data_do_dia: string
   contacto_estudante: string
-  template: "rendimento" | "declaracao" | "certificado"
+  empresa_estagio: string
+  template: "rendimento" | "declaracao" | "certificado" | "carta_estagio"
   formato: "docx" | "pdf"
 }
 
@@ -56,15 +58,36 @@ const TEMPLATE_MAP: Record<TipoDocumento, DocxData["template"]> = {
   rendimento_pedagogico: "rendimento",
   declaracao_vinculo: "declaracao",
   certificado_conclusao: "certificado",
+  carta_estagio: "carta_estagio",
 }
 
 function normalizeTipo(tipo?: string): TipoDocumento | undefined {
   if (!tipo) return undefined
   const normalized = tipo.replace(/-/g, "_")
-  if (normalized === "rendimento_pedagogico" || normalized === "declaracao_vinculo" || normalized === "certificado_conclusao") {
+  if (
+    normalized === "rendimento_pedagogico" ||
+    normalized === "declaracao_vinculo" ||
+    normalized === "certificado_conclusao" ||
+    normalized === "carta_estagio"
+  ) {
     return normalized as TipoDocumento
   }
   return undefined
+}
+
+function normalizeFaculdadeValue(value?: string): string {
+  if (!value) return ""
+
+  const normalized = value.trim()
+  if (normalized === "FD") return "Faculdade de Direito"
+  if (normalized === "FCT") return "Faculdade de Ciências e Tecnologia"
+  if (normalized === "FCSH") return "Faculdade de Ciências Sociais e Humanidades"
+  if (normalized === "FEAF") return "Faculdade de Engenharia Agronómica e Florestal"
+  if (normalized === "FCA") return "Faculdade de Ciências Agrárias"
+  if (normalized === "FCS") return "Faculdade de Ciências de Saúde — Tete"
+  if (normalized === "FEARN") return "Faculdade de Engenharia Ambiental e dos Recursos Naturais"
+
+  return normalized
 }
 
 function getTemplate(payload: DocxApiRequest): DocxData["template"] {
@@ -92,7 +115,7 @@ function buildDocxData(payload: DocxApiRequest): DocxData {
     provincia_residencia: source.provincia_residencia || source.provincia || source.provincia_emissaoBI || "",
     nacionalidade: source.nacionalidade || "moçambicana",
     periodo_frequentado: source.periodo || source.periodo_frequentado || "",
-    faculdade_: source.faculdade || source.faculdade_ || "",
+    faculdade_: normalizeFaculdadeValue(source.faculdade || source.faculdade_ || ""),
     ano_actual: String(source.ano_actual ?? new Date().getFullYear()),
     ano_lectivo: String(source.ano_lectivo ?? source.ano_actual ?? new Date().getFullYear()),
     codigo_estudante: source.registo_n || source.codigo_estudante || "",
@@ -102,6 +125,7 @@ function buildDocxData(payload: DocxApiRequest): DocxData {
     semestre_pretendido: source.semestre_pretendido || "",
     data_do_dia: formatDateLongPortuguese(source.data_actual || source.data_do_dia),
     contacto_estudante: source.contacto || source.contacto_estudante || "",
+    empresa_estagio: source.empresa_estagio || "",
     template,
     formato: "docx",
   }

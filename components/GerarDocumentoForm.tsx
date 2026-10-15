@@ -12,6 +12,7 @@ const documentTypes = [
   { label: "Rendimento Pedagógico", value: "rendimento-pedagogico" },
   { label: "Declaração de Vínculo", value: "declaracao-vinculo" },
   { label: "Certificado de Conclusão", value: "certificado-conclusao" },
+  { label: "Carta de Estágio", value: "carta-estagio" },
   { label: "Diploma", value: "diploma" },
 ];
 
@@ -31,15 +32,24 @@ const PROVINCIAS = [
 ];
 
 const FACULDADES = [
-  { label: "FD", value: "Faculdade de Direito" },
-  { label: "FCT", value: "Faculdade de Ciências e Tecnologia" },
-  { label: "FCSH", value: "Faculdade de Ciências Sociais e Humanidades" },
-  { label: "FEAF", value: "Faculdade de Engenharia Agronómica e Florestal" },
-  { label: "FCA", value: "Faculdade de Ciências Agrárias" },
-  { label: "FCA" , value: "Faculdade de Ciências Agrárias — Ulóngue-Angónia, Tete" },
-  { label: "FCS", value: "Faculdade de Ciências de Saúde — Tete" },
-  { label: "FEARN", value: "Faculdade de Engenharia Ambiental e dos Recursos Naturais" },
-]
+  { label: "FD", value: "FD" },
+  { label: "FCT", value: "FCT" },
+  { label: "FCSH", value: "FCSH" },
+  { label: "FEAF", value: "FEAF" },
+  { label: "FCA", value: "FCA" },
+  { label: "FCS", value: "FCS" },
+  { label: "FEARN", value: "FEARN" },
+];
+
+const FACULDADE_MAP: Record<string, string> = {
+  FD: "Faculdade de Direito",
+  FCT: "Faculdade de Ciências e Tecnologia",
+  FCSH: "Faculdade de Ciências Sociais e Humanidades",
+  FEAF: "Faculdade de Engenharia Agronómica e Florestal",
+  FCA: "Faculdade de Ciências Agrárias",
+  FCS: "Faculdade de Ciências de Saúde — Tete",
+  FEARN: "Faculdade de Engenharia Ambiental e dos Recursos Naturais",
+};
 
 // ── Dropdown genérico reutilizável ─────────────────────────────────────────
 function SimpleDropdown({
@@ -138,6 +148,7 @@ export default function GerarDocumentoForm() {
     semestrePretendido: "",
     tipoDocumento: "",
     contacto: "",
+    empresaEstagio: "",
   });
 
   useEffect(() => {
@@ -162,6 +173,11 @@ export default function GerarDocumentoForm() {
       return;
     }
 
+    if (form.tipoDocumento === "carta-estagio" && !form.empresaEstagio.trim()) {
+      alert("Por favor preencha a empresa / instituição de estágio.");
+      return;
+    }
+
     setIsGenerating(true);
   };
 
@@ -169,11 +185,13 @@ export default function GerarDocumentoForm() {
     "rendimento-pedagogico": "rendimento_pedagogico",
     "declaracao-vinculo": "declaracao_vinculo",
     "certificado-conclusao": "certificado_conclusao",
+    "carta-estagio": "carta_estagio",
     diploma: "rendimento_pedagogico",
   };
 
   const handleGenerateComplete = useCallback(() => {
     const apiTipo = documentTypeMap[form.tipoDocumento] ?? form.tipoDocumento;
+    const faculdadeCompleta = FACULDADE_MAP[form.faculdade] ?? form.faculdade;
 
     const payload = {
       tipo: apiTipo,
@@ -186,7 +204,7 @@ export default function GerarDocumentoForm() {
         provincia: form.provincia,
         nacionalidade: form.nacionalidade || "Moçambicana",
         periodo: form.periodoFrequencia,
-        faculdade: form.faculdade,
+        faculdade: faculdadeCompleta,
         ano_lectivo: form.anoLectivo || currentYear,
         registo_n: form.numeroEstudante,
         curso: form.curso,
@@ -195,6 +213,7 @@ export default function GerarDocumentoForm() {
         semestre_pretendido: form.semestrePretendido,
         data_actual: formatDateLongPortuguese(new Date()),
         contacto: form.contacto,
+        empresa_estagio: form.tipoDocumento === "carta-estagio" ? form.empresaEstagio : "",
       },
     };
     const encoded = encodeURIComponent(JSON.stringify(payload));
@@ -322,6 +341,11 @@ export default function GerarDocumentoForm() {
         </select>
       </div>
     </>
+  )}
+
+  {form.tipoDocumento === "carta-estagio" && (
+    <Input label="Empresa / Instituição de Estágio" name="empresaEstagio"
+      placeholder="Ex: Eletricidade de Moçambique" value={form.empresaEstagio} onChange={handleChange} />
   )}
 
   <div className="flex flex-col gap-1 w-full md:col-span-2">

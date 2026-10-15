@@ -1,28 +1,40 @@
+import type { LucideIcon } from "lucide-react";
+
 interface StepCardProps {
   step: number;
+  icon: LucideIcon;
   title: string;
   description: string;
 }
 
-export default function StepCard({ step, title, description }: StepCardProps) {
+export default function StepCard({ step, icon: Icon, title, description }: StepCardProps) {
   return (
-    <div className="flex flex-col items-center text-center p-8 bg-primary rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full">
+    <div className="group relative flex flex-col items-start text-left p-7 bg-neutral-white border border-neutral-dark/10 rounded-2xl overflow-hidden hover:border-primary/30 hover:shadow-lg transition-[border-color,box-shadow] duration-300 w-full">
 
-      {/* Número do passo */}
-      <div className="w-14 h-14 rounded-full bg-neutral-white flex items-center justify-center mb-5 shadow-md">
-        <span className="text-primary font-bold text-xl font-heading">{step}</span>
+      {/* Barra de destaque no hover */}
+      <span className="absolute inset-x-0 top-0 h-1 bg-primary scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-300"></span>
+
+      {/* Ícone */}
+      <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors duration-300">
+        <Icon
+          aria-hidden="true"
+          className="w-5 h-5 text-primary group-hover:text-neutral-white transition-colors duration-300"
+          strokeWidth={2}
+        />
       </div>
 
+      {/* Número do passo */}
+      <span className="text-primary text-xs font-semibold uppercase tracking-widest font-heading mb-2">
+        Passo {String(step).padStart(2, "0")}
+      </span>
+
       {/* Título */}
-      <h3 className="text-neutral-white font-bold text-lg font-heading tracking-wide mb-3">
+      <h3 className="text-neutral-dark font-bold text-lg font-heading tracking-wide mb-2">
         {title}
       </h3>
 
-      {/* Divisor */}
-      <div className="w-8 h-[2px] bg-neutral-white opacity-40 mb-3"></div>
-
       {/* Descrição */}
-      <p className="text-neutral-white text-sm leading-relaxed opacity-90 font-sans">
+      <p className="text-neutral-dark/60 text-sm leading-relaxed font-sans">
         {description}
       </p>
 

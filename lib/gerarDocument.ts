@@ -1,4 +1,3 @@
-
 //import path from "path";
 import fs from "fs";
 import PizZip from "pizzip";
@@ -26,6 +25,7 @@ type DocxData = {
   ano_do_curso: string;
 
   // Dados do requerimento
+  empresa_estagio: string;
   ano_pretende_levantar: number;
   semestre_pretendido: string;
   data_do_dia: string;
@@ -34,7 +34,7 @@ type DocxData = {
   contacto_estudante: string;
 
   // Metadados do documento
-  template: "rendimento" | "declaracao" | "certificado";
+  template: "rendimento" | "declaracao" | "certificado" | "carta_estagio";
   formato: "docx" | "pdf";
 };
 
@@ -42,6 +42,7 @@ const TEMPLATE_MAP = {
   rendimento: "rendimento_pedagogico.docx",
   declaracao: "declaracao_vinculo.docx",
   certificado: "certificado.docx",
+  carta_estagio: "Carta_Estagio.docx",
 } as const;
 
 function buildTextoRequerimento(data: DocxData): string {
@@ -82,6 +83,49 @@ function buildTextoRequerimento(data: DocxData): string {
   ].join(" ");
 }
 
+function buildCartaEstagioBuffer(filePath: string, data: DocxData): Buffer {
+  const content = fs.readFileSync(filePath, "binary");
+  const zip = new PizZip(content);
+  const doc = new Docxtemplater(zip, {
+    paragraphLoop: true,
+    linebreaks: true,
+    nullGetter: () => "",
+  });
+
+  const faculdade = (data.faculdade_ || "").trim();
+  // O template já escreve "na faculdade de {faculdade_}", por isso removemos o prefixo
+  const faculdadeSemPrefixo = faculdade.replace(/^faculdade\s+de\s+/i, "");
+
+  const dados = {
+    faculdade_nome: faculdade ? `DA ${faculdade.toUpperCase()}` : "",
+    nome_estudante: data.nome_estudante,
+    numero_BI: data.numero_BI,
+    cidade_emissaoBI: data.cidade_emissaoBI,
+    data_emissaoBI: data.data_emissaoBI,
+    provincia_emissaoBI: data.provincia_emissaoBI,
+    periodo_frequentado: data.periodo_frequentado,
+    faculdade_: faculdadeSemPrefixo,
+    ano_actual: data.ano_lectivo || data.ano_actual,
+    codigo_estudante: data.codigo_estudante,
+    curso_frequentado: data.curso_frequentado,
+    nome_empresa: data.empresa_estagio,
+    data_do_dia: data.data_do_dia,
+    contacto_estudante: data.contacto_estudante,
+  };
+
+  try {
+    doc.render(dados);
+  } catch (error) {
+    console.error("Erro ao renderizar carta de estágio:", error);
+    throw new Error("Falha ao preencher a carta de estágio");
+  }
+
+  return doc.getZip().generate({
+    type: "nodebuffer",
+    compression: "DEFLATE",
+  });
+}
+
 export async function generateDocx(data: DocxData): Promise<Buffer> {
   const templateFile = TEMPLATE_MAP[data.template];
   if (!templateFile) {
@@ -97,6 +141,10 @@ export async function generateDocx(data: DocxData): Promise<Buffer> {
 
   if (!fs.existsSync(filePath)) {
     throw new Error("Arquivo de template não encontrado");
+  }
+
+  if (data.template === "carta_estagio") {
+    return buildCartaEstagioBuffer(filePath, data);
   }
 
   const content = fs.readFileSync(filePath, "binary");
